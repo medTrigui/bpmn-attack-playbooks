@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" 
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:attack="http://attack.mitre.org/bpmn/extension"
+                  xmlns:irp="http://incident-response/bpmn/extension"
+                  id="Definitions_Phishing" 
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="Process_PhishingInvestigation" name="Phishing Investigation Playbook" isExecutable="true">
+    
+    <bpmn:startEvent id="StartEvent_1" name="Phishing Report Received">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <bpmn:task id="Task_AnalyzeEmail" name="Analyze Reported Email">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <attack:mapping>
+          <attack:technique id="T1566.001" name="Phishing: Spearphishing Attachment"/>
+          <attack:tactic>Initial Access</attack:tactic>
+        </attack:mapping>
+        <attack:mapping>
+          <attack:technique id="T1566.002" name="Phishing: Spearphishing Link"/>
+          <attack:tactic>Initial Access</attack:tactic>
+        </attack:mapping>
+        <irp:metadata>
+          <irp:phase>analysis</irp:phase>
+          <irp:role>SOC Analyst L1</irp:role>
+          <irp:tool>Email Gateway, Phishing analysis tools</irp:tool>
+          <irp:evidence>Email headers, body, attachments, links</irp:evidence>
+          <irp:priority>high</irp:priority>
+          <irp:estimatedTime>15 minutes</irp:estimatedTime>
+        </irp:metadata>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_ExtractIOCs" name="Extract IOCs">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <attack:mapping>
+          <attack:technique id="T1204.002" name="User Execution: Malicious File"/>
+          <attack:tactic>Execution</attack:tactic>
+        </attack:mapping>
+        <irp:metadata>
+          <irp:phase>analysis</irp:phase>
+          <irp:role>SOC Analyst L2</irp:role>
+          <irp:tool>Sandbox, VirusTotal, URL analysis</irp:tool>
+          <irp:evidence>Sender email, domains, IPs, file hashes, URLs</irp:evidence>
+          <irp:priority>high</irp:priority>
+          <irp:estimatedTime>20 minutes</irp:estimatedTime>
+        </irp:metadata>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_SearchSimilar" name="Search for Similar Emails">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <attack:mapping>
+          <attack:technique id="T1566" name="Phishing"/>
+          <attack:tactic>Initial Access</attack:tactic>
+        </attack:mapping>
+        <irp:metadata>
+          <irp:phase>detection</irp:phase>
+          <irp:role>SOC Analyst L2</irp:role>
+          <irp:tool>Email Gateway, SIEM</irp:tool>
+          <irp:evidence>Email logs, matching criteria</irp:evidence>
+          <irp:priority>high</irp:priority>
+          <irp:estimatedTime>15 minutes</irp:estimatedTime>
+        </irp:metadata>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_QuarantineEmails" name="Quarantine Malicious Emails">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <attack:mapping>
+          <attack:technique id="T1566" name="Phishing"/>
+          <attack:tactic>Initial Access</attack:tactic>
+        </attack:mapping>
+        <irp:metadata>
+          <irp:phase>containment</irp:phase>
+          <irp:role>SOC Analyst L2</irp:role>
+          <irp:tool>Email Gateway</irp:tool>
+          <irp:evidence>Quarantine logs, affected user list</irp:evidence>
+          <irp:priority>critical</irp:priority>
+          <irp:estimatedTime>10 minutes</irp:estimatedTime>
+        </irp:metadata>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_BlockIOCs" name="Block IOCs">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <attack:mapping>
+          <attack:technique id="T1071" name="Application Layer Protocol"/>
+          <attack:tactic>Command and Control</attack:tactic>
+        </attack:mapping>
+        <irp:metadata>
+          <irp:phase>containment</irp:phase>
+          <irp:role>Security Engineer</irp:role>
+          <irp:tool>Firewall, DNS filter, Email Gateway</irp:tool>
+          <irp:evidence>Block rules, denied connections</irp:evidence>
+          <irp:priority>high</irp:priority>
+          <irp:estimatedTime>15 minutes</irp:estimatedTime>
+        </irp:metadata>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_NotifyUsers" name="Notify Affected Users">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <irp:metadata>
+          <irp:phase>recovery</irp:phase>
+          <irp:role>SOC Analyst L1</irp:role>
+          <irp:tool>Email, Ticketing system</irp:tool>
+          <irp:evidence>User notification logs</irp:evidence>
+          <irp:priority>medium</irp:priority>
+          <irp:estimatedTime>20 minutes</irp:estimatedTime>
+        </irp:metadata>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    
+    <bpmn:endEvent id="EndEvent_1" name="Investigation Complete">
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Sequence Flows -->
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_AnalyzeEmail"/>
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_AnalyzeEmail" targetRef="Task_ExtractIOCs"/>
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_ExtractIOCs" targetRef="Task_SearchSimilar"/>
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_SearchSimilar" targetRef="Task_QuarantineEmails"/>
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_QuarantineEmails" targetRef="Task_BlockIOCs"/>
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_BlockIOCs" targetRef="Task_NotifyUsers"/>
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_NotifyUsers" targetRef="EndEvent_1"/>
+    
+  </bpmn:process>
+</bpmn:definitions>
+

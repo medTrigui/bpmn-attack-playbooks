@@ -1,0 +1,133 @@
+.task-properties-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.task-properties-panel.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.panel-header h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.task-type-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background: #eff6ff;
+  color: #3b82f6;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.property-group {
+  margin-bottom: 1.25rem;
+}
+
+.property-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.property-group input[type="text"],
+.property-group select,
+.property-group textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s;
+  background: white;
+}
+
+.property-group input[type="text"]:focus,
+.property-group select:focus,
+.property-group textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.property-group textarea {
+  resize: vertical;
+}
+
+.priority-selector {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.priority-btn {
+  padding: 0.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: capitalize;
+}
+
+.priority-btn:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.priority-btn.active {
+  border-color: currentColor;
+  background: currentColor;
+  color: white;
+}
+
+.priority-btn.low {
+  color: #10b981;
+}
+
+.priority-btn.medium {
+  color: #f59e0b;
+}
+
+.priority-btn.high {
+  color: #f97316;
+}
+
+.priority-btn.critical {
+  color: #ef4444;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.panel-actions .btn {
+  flex: 1;
+  padding: 0.625rem;
+  font-size: 0.875rem;
+}
+

@@ -1,0 +1,196 @@
+.bpmn-editor-wrapper {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.editor-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  gap: 1rem;
+}
+
+.playbook-name-input {
+  flex: 1;
+  max-width: 400px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.playbook-name-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-outline {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-outline:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background: #eff6ff;
+}
+
+.bpmn-canvas {
+  flex: 1;
+  background: #fafafa;
+  position: relative;
+}
+
+/* BPMN.js specific overrides */
+.bpmn-canvas .djs-container {
+  background: #fafafa !important;
+}
+
+.bpmn-canvas .djs-palette {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.bpmn-canvas .djs-context-pad {
+  border-radius: 8px;
+}
+
+/* Validation Panel */
+.validation-panel {
+  position: absolute;
+  top: 4rem;
+  right: 1rem;
+  width: 350px;
+  max-height: 500px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.validation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.validation-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.validation-content {
+  padding: 1rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.validation-status {
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.validation-status.valid {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.validation-status.invalid {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.validation-section {
+  margin-top: 1rem;
+}
+
+.validation-section h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.validation-section.errors h4 {
+  color: #dc2626;
+}
+
+.validation-section.warnings h4 {
+  color: #f59e0b;
+}
+
+.validation-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.validation-section li {
+  padding: 0.5rem;
+  background: #f9fafb;
+  border-left: 3px solid #e5e7eb;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 4px;
+}
+
+.validation-section.errors li {
+  border-left-color: #dc2626;
+  background: #fef2f2;
+}
+
+.validation-section.warnings li {
+  border-left-color: #f59e0b;
+  background: #fffbeb;
+}
+

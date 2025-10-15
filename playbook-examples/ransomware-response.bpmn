@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" 
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:attack="http://attack.mitre.org/bpmn/extension"
+                  xmlns:irp="http://incident-response/bpmn/extension"
+                  id="Definitions_Ransomware" 
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="Process_RansomwareResponse" name="Ransomware Response Playbook" isExecutable="true">
+    
+    <bpmn:startEvent id="StartEvent_1" name="Ransomware Detected">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <bpmn:task id="Task_VerifyIncident" name="Verify Ransomware Activity">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <attack:mapping>
+          <attack:technique id="T1486" name="Data Encrypted for Impact"/>
+          <attack:tactic>Impact</attack:tactic>
+        </attack:mapping>
+        <irp:metadata>
+          <irp:phase>detection</irp:phase>
+          <irp:role>SOC Analyst L1</irp:role>
+          <irp:tool>EDR, SIEM</irp:tool>
+          <irp:evidence>System logs, file system changes, ransom notes</irp:evidence>
+          <irp:priority>critical</irp:priority>
+          <irp:estimatedTime>10 minutes</irp:estimatedTime>
+        </irp:metadata>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_IsolateHosts" name="Isolate Infected Systems">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <attack:mapping>
+          <attack:technique id="T1486" name="Data Encrypted for Impact"/>
+          <attack:tactic>Impact</attack:tactic>
+        </attack:mapping>
+        <irp:metadata>
+          <irp:phase>containment</irp:phase>
+          <irp:role>SOC Analyst L2</irp:role>
+          <irp:tool>EDR Console, Network Access Control</irp:tool>
+          <irp:evidence>Host inventory, network connections</irp:evidence>
+          <irp:priority>critical</irp:priority>
+          <irp:estimatedTime>15 minutes</irp:estimatedTime>
+        </irp:metadata>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_IdentifyVariant" name="Identify Ransomware Variant">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <attack:mapping>
+          <attack:technique id="T1486" name="Data Encrypted for Impact"/>
+          <attack:tactic>Impact</attack:tactic>
+        </attack:mapping>
+        <irp:metadata>
+          <irp:phase>analysis</irp:phase>
+          <irp:role>Incident Responder</irp:role>
+          <irp:tool>Malware sandbox, ID Ransomware</irp:tool>
+          <irp:evidence>Ransom note, encrypted file samples, file extensions</irp:evidence>
+          <irp:priority>high</irp:priority>
+          <irp:estimatedTime>30 minutes</irp:estimatedTime>
+        </irp:metadata>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_BlockC2" name="Block C2 Communications">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <attack:mapping>
+          <attack:technique id="T1071" name="Application Layer Protocol"/>
+          <attack:tactic>Command and Control</attack:tactic>
+        </attack:mapping>
+        <irp:metadata>
+          <irp:phase>containment</irp:phase>
+          <irp:role>Security Engineer</irp:role>
+          <irp:tool>Firewall, DNS filter, Proxy</irp:tool>
+          <irp:evidence>C2 domains/IPs, network traffic logs</irp:evidence>
+          <irp:priority>high</irp:priority>
+          <irp:estimatedTime>20 minutes</irp:estimatedTime>
+        </irp:metadata>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_Eradicate" name="Remove Ransomware">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <attack:mapping>
+          <attack:technique id="T1489" name="Service Stop"/>
+          <attack:tactic>Impact</attack:tactic>
+        </attack:mapping>
+        <irp:metadata>
+          <irp:phase>eradication</irp:phase>
+          <irp:role>Incident Responder</irp:role>
+          <irp:tool>EDR, Antivirus</irp:tool>
+          <irp:evidence>Malware hashes, persistence mechanisms</irp:evidence>
+          <irp:priority>high</irp:priority>
+          <irp:estimatedTime>1 hour</irp:estimatedTime>
+        </irp:metadata>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_RestoreBackups" name="Restore from Clean Backups">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <attack:mapping>
+          <attack:technique id="T1490" name="Inhibit System Recovery"/>
+          <attack:tactic>Impact</attack:tactic>
+        </attack:mapping>
+        <irp:metadata>
+          <irp:phase>recovery</irp:phase>
+          <irp:role>System Administrator</irp:role>
+          <irp:tool>Backup system, Storage arrays</irp:tool>
+          <irp:evidence>Backup logs, integrity verification</irp:evidence>
+          <irp:priority>high</irp:priority>
+          <irp:estimatedTime>2-4 hours</irp:estimatedTime>
+        </irp:metadata>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    
+    <bpmn:task id="Task_PostIncident" name="Document and Create Report">
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <irp:metadata>
+          <irp:phase>post-incident</irp:phase>
+          <irp:role>Incident Responder</irp:role>
+          <irp:tool>Ticketing system, Documentation platform</irp:tool>
+          <irp:evidence>Timeline, IOCs, impact assessment, lessons learned</irp:evidence>
+          <irp:priority>medium</irp:priority>
+          <irp:estimatedTime>1-2 hours</irp:estimatedTime>
+        </irp:metadata>
+      </bpmn:extensionElements>
+    </bpmn:task>
+    
+    <bpmn:endEvent id="EndEvent_1" name="Incident Resolved">
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- Sequence Flows -->
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_VerifyIncident"/>
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_VerifyIncident" targetRef="Task_IsolateHosts"/>
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_IsolateHosts" targetRef="Task_IdentifyVariant"/>
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_IdentifyVariant" targetRef="Task_BlockC2"/>
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_BlockC2" targetRef="Task_Eradicate"/>
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_Eradicate" targetRef="Task_RestoreBackups"/>
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_RestoreBackups" targetRef="Task_PostIncident"/>
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Task_PostIncident" targetRef="EndEvent_1"/>
+    
+  </bpmn:process>
+</bpmn:definitions>
+
