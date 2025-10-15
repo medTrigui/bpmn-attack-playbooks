@@ -95,10 +95,12 @@ export const validationAPI = {
   }
 };
 
-export default {
+const apiService = {
   checkBackendHealth,
   attack: attackAPI,
   playbooks: playbooksAPI,
   validation: validationAPI
 };
+
+export default apiService;
 
