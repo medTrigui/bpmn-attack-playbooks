@@ -149,12 +149,37 @@ export const incidentsAPI = {
   }
 };
 
+export const evidenceAPI = {
+  fetchByIncident: async (incidentId) => {
+    const response = await axios.get(`${API_BASE_URL}/evidence/incident/${incidentId}`);
+    return response.data;
+  },
+
+  fetchByTask: async (taskId) => {
+    const response = await axios.get(`${API_BASE_URL}/evidence/task/${taskId}`);
+    return response.data;
+  },
+
+  upload: async (formData) => {
+    const response = await axios.post(`${API_BASE_URL}/evidence/`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
+  delete: async (evidenceId) => {
+    const response = await axios.delete(`${API_BASE_URL}/evidence/${evidenceId}`);
+    return response.data;
+  }
+};
+
 const apiService = {
   checkBackendHealth,
   attack: attackAPI,
   playbooks: playbooksAPI,
   validation: validationAPI,
-  incidents: incidentsAPI
+  incidents: incidentsAPI,
+  evidence: evidenceAPI
 };
 
 export default apiService;

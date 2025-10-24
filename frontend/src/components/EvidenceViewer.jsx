@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { fetchEvidenceByIncident, uploadEvidence } from '../services/apiService';
+import { evidenceAPI } from '../services/apiService';
+import './EvidenceViewer.css';
 
-export default function EvidenceViewer({ incidentId }) {
+function EvidenceViewer({ incidentId, taskId }) {
   const [evidenceList, setEvidenceList] = useState([]);
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
@@ -10,35 +11,64 @@ export default function EvidenceViewer({ incidentId }) {
   const [collectedBy, setCollectedBy] = useState('');
 
   useEffect(() => {
-    if (incidentId) loadEvidence();
-  }, [incidentId]);
+    if (incidentId) fetchEvidence();
+  }, [incidentId, taskId]);
 
-  const loadEvidence = async () => {
-    const data = await fetchEvidenceByIncident(incidentId);
-    setEvidenceList(data);
+  const fetchEvidence = async () => {
+    try {
+      let data = [];
+      if (incidentId) {
+        data = await evidenceAPI.fetchByIncident(incidentId);
+      } else if (taskId) {
+        data = await evidenceAPI.fetchByTask(taskId);
+      }
+      setEvidenceList(data);
+    } catch (err) {
+      console.error('Error fetching evidence:', err);
+    }
   };
 
-  const handleFileChange = (e) => setFile(e.target.files[0]);
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!file) return;
+    if (!file && !title) {
+      alert('Please select a file or provide a title for text/URL evidence.');
+      return;
+    }
 
     const formData = new FormData();
-    formData.append('file', file);
+    if (file) formData.append('file', file);
     formData.append('incident_id', incidentId);
-    formData.append('title', title || file.name);
+    if (taskId) formData.append('task_execution_id', taskId);
+    formData.append('title', title || (file ? file.name : 'New Evidence'));
     formData.append('description', description);
+    formData.append('collected_by', collectedBy || 'Unknown');
     formData.append('severity', severity);
-    formData.append('collected_by', collectedBy);
 
-    await uploadEvidence(formData);
-    setFile(null);
-    setTitle('');
-    setDescription('');
-    setSeverity('informational');
-    setCollectedBy('');
-    loadEvidence();
+    try {
+      await evidenceAPI.upload(formData);
+      setFile(null);
+      setTitle('');
+      setDescription('');
+      setSeverity('informational');
+      setCollectedBy('');
+      fetchEvidence();
+    } catch (err) {
+      console.error('Error uploading evidence:', err);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this evidence?')) return;
+    try {
+      await evidenceAPI.delete(id);
+      fetchEvidence();
+    } catch (err) {
+      console.error('Error deleting evidence:', err);
+    }
   };
 
   return (
@@ -46,7 +76,7 @@ export default function EvidenceViewer({ incidentId }) {
       <form className="upload-form" onSubmit={handleUpload}>
         <div className="form-group">
           <label>File</label>
-          <input type="file" onChange={handleFileChange} required />
+          <input type="file" onChange={handleFileChange} />
         </div>
         <div className="form-group">
           <label>Title</label>
@@ -55,6 +85,10 @@ export default function EvidenceViewer({ incidentId }) {
         <div className="form-group">
           <label>Description</label>
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+        </div>
+        <div className="form-group">
+          <label>Collected By</label>
+          <input type="text" value={collectedBy} onChange={(e) => setCollectedBy(e.target.value)} />
         </div>
         <div className="form-group">
           <label>Severity</label>
@@ -66,10 +100,6 @@ export default function EvidenceViewer({ incidentId }) {
             <option value="critical">Critical</option>
           </select>
         </div>
-        <div className="form-group">
-          <label>Collected By</label>
-          <input type="text" value={collectedBy} onChange={(e) => setCollectedBy(e.target.value)} />
-        </div>
         <button type="submit" className="btn btn-primary">Upload Evidence</button>
       </form>
 
@@ -80,21 +110,15 @@ export default function EvidenceViewer({ incidentId }) {
               <h4>{e.title}</h4>
               <span className={`badge severity-${e.severity}`}>{e.severity}</span>
             </div>
-            {e.description && <p className="evidence-description">{e.description}</p>}
+            <p className="evidence-description">{e.description}</p>
             {e.file_path && (
-              <a href={e.file_path} className="download-link" target="_blank" rel="noopener noreferrer">
-                Download
+              <a className="download-link" href={e.file_path} target="_blank" rel="noopener noreferrer">
+                Download File
               </a>
             )}
-            {e.url && (
-              <a href={e.url} className="download-link" target="_blank" rel="noopener noreferrer">
-                View Link
-              </a>
-            )}
-            {e.content && <pre className="evidence-description">{e.content}</pre>}
             <div className="evidence-footer">
               <span>Collected by: {e.collected_by}</span>
-              <span>{new Date(e.collected_at).toLocaleString()}</span>
+              <button className="btn-icon" onClick={() => handleDelete(e.id)}>🗑️</button>
             </div>
           </div>
         ))}
@@ -102,3 +126,5 @@ export default function EvidenceViewer({ incidentId }) {
     </div>
   );
 }
+
+export default EvidenceViewer;
