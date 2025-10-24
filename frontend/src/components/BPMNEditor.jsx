@@ -5,7 +5,7 @@ import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
 import './BPMNEditor.css';
 import { playbooksAPI, validationAPI } from '../services/apiService';
 
-const BPMNEditor = ({ onTaskSelect, currentPlaybook }) => {
+const BPMNEditor = ({ onTaskSelect, currentPlaybook, onModelerReady }) => {
   const containerRef = useRef(null);
   const modelerRef = useRef(null);
   const [playbookName, setPlaybookName] = useState('');
@@ -52,11 +52,17 @@ const BPMNEditor = ({ onTaskSelect, currentPlaybook }) => {
       console.error('Error loading BPMN diagram:', err);
     });
 
+    // Notify parent that modeler is ready
+    if (onModelerReady) {
+      onModelerReady(modeler);
+    }
+
     // Handle element selection
     const eventBus = modeler.get('eventBus');
     eventBus.on('element.click', (e) => {
       const element = e.element;
-      if (element.type === 'bpmn:Task') {
+      if (element.type === 'bpmn:Task' || element.type === 'bpmn:UserTask' || 
+          element.type === 'bpmn:ManualTask' || element.type === 'bpmn:ServiceTask') {
         onTaskSelect({
           id: element.id,
           name: element.businessObject.name || 'Unnamed Task',
@@ -69,15 +75,30 @@ const BPMNEditor = ({ onTaskSelect, currentPlaybook }) => {
     return () => {
       modeler.destroy();
     };
-  }, [onTaskSelect]);
+  }, [onTaskSelect, onModelerReady]);
 
   // Load playbook when selected
   useEffect(() => {
     if (currentPlaybook && modelerRef.current) {
+      console.log('Loading playbook:', currentPlaybook);
       setPlaybookName(currentPlaybook.id);
-      modelerRef.current.importXML(currentPlaybook.bpmn_xml).catch(err => {
-        console.error('Error loading playbook:', err);
-      });
+      
+      if (currentPlaybook.bpmn_xml) {
+        modelerRef.current.importXML(currentPlaybook.bpmn_xml)
+          .then(() => {
+            console.log('Playbook loaded successfully');
+            // Zoom to fit
+            const canvas = modelerRef.current.get('canvas');
+            canvas.zoom('fit-viewport');
+          })
+          .catch(err => {
+            console.error('Error loading playbook:', err);
+            alert(`Failed to load playbook: ${err.message}`);
+          });
+      } else {
+        console.error('No BPMN XML in playbook data');
+        alert('Playbook data is missing or corrupted');
+      }
     }
   }, [currentPlaybook]);
 
@@ -127,16 +148,62 @@ const BPMNEditor = ({ onTaskSelect, currentPlaybook }) => {
     }
   };
 
+  const handleNew = () => {
+    if (modelerRef.current) {
+      const initialDiagram = `<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" 
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:attack="http://attack.mitre.org/bpmn/extension"
+                  xmlns:irp="http://incident-response/bpmn/extension"
+                  id="Definitions_1" 
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="Process_1" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Start"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="159" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>`;
+
+      setPlaybookName('');
+      modelerRef.current.importXML(initialDiagram)
+        .then(() => {
+          console.log('New playbook created');
+          const canvas = modelerRef.current.get('canvas');
+          canvas.zoom('fit-viewport');
+        })
+        .catch(err => {
+          console.error('Error creating new playbook:', err);
+        });
+    }
+  };
+
   return (
     <div className="bpmn-editor-wrapper">
       <div className="editor-toolbar">
-        <input
-          type="text"
-          placeholder="Playbook name..."
-          value={playbookName}
-          onChange={(e) => setPlaybookName(e.target.value)}
-          className="playbook-name-input"
-        />
+        <div className="toolbar-left">
+          <button onClick={handleNew} className="btn btn-secondary" title="Create new playbook">
+            New
+          </button>
+          <input
+            type="text"
+            placeholder="Enter playbook name..."
+            value={playbookName}
+            onChange={(e) => setPlaybookName(e.target.value)}
+            className="playbook-name-input"
+          />
+          {currentPlaybook && (
+            <span className="loaded-indicator">
+              ✓ Loaded: {currentPlaybook.name}
+            </span>
+          )}
+        </div>
         <div className="toolbar-actions">
           <button onClick={handleValidate} className="btn btn-outline">
             Validate
@@ -145,7 +212,7 @@ const BPMNEditor = ({ onTaskSelect, currentPlaybook }) => {
             Export
           </button>
           <button onClick={handleSave} disabled={isSaving} className="btn btn-primary">
-            {isSaving ? 'Saving...' : 'Save'}
+            {isSaving ? 'Saving...' : 'Save to Library'}
           </button>
         </div>
       </div>

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './TaskPropertiesPanel.css';
 
-const TaskPropertiesPanel = ({ task }) => {
+const TaskPropertiesPanel = ({ task, modeler, selectedTechniques }) => {
   const [properties, setProperties] = useState({
-    name: task?.name || '',
+    name: '',
     role: '',
     tool: '',
     evidence: '',
@@ -12,18 +12,107 @@ const TaskPropertiesPanel = ({ task }) => {
     estimatedTime: '',
     notes: ''
   });
+  const [hasChanges, setHasChanges] = useState(false);
+
+  // Load task properties when task changes
+  useEffect(() => {
+    if (task && modeler) {
+      const elementRegistry = modeler.get('elementRegistry');
+      const element = elementRegistry.get(task.id);
+      
+      if (element) {
+        const businessObject = element.businessObject;
+        
+        setProperties({
+          name: businessObject.name || '',
+          role: businessObject.$attrs['irp:role'] || '',
+          tool: businessObject.$attrs['irp:tool'] || '',
+          evidence: businessObject.$attrs['irp:evidence'] || '',
+          phase: businessObject.$attrs['irp:phase'] || 'detection',
+          priority: businessObject.$attrs['irp:priority'] || 'medium',
+          estimatedTime: businessObject.$attrs['irp:estimatedTime'] || '',
+          notes: businessObject.$attrs['irp:notes'] || ''
+        });
+        setHasChanges(false);
+      }
+    }
+  }, [task, modeler]);
 
   const handleChange = (field, value) => {
     setProperties(prev => ({
       ...prev,
       [field]: value
     }));
+    setHasChanges(true);
+  };
+
+  const handleApply = () => {
+    if (!task || !modeler) return;
+
+    const modeling = modeler.get('modeling');
+    const elementRegistry = modeler.get('elementRegistry');
+    const element = elementRegistry.get(task.id);
+
+    if (element) {
+      // Update name
+      modeling.updateLabel(element, properties.name);
+
+      // Update custom properties
+      modeling.updateProperties(element, {
+        'irp:role': properties.role,
+        'irp:tool': properties.tool,
+        'irp:evidence': properties.evidence,
+        'irp:phase': properties.phase,
+        'irp:priority': properties.priority,
+        'irp:estimatedTime': properties.estimatedTime,
+        'irp:notes': properties.notes
+      });
+
+      // Update ATT&CK techniques if selected
+      if (selectedTechniques && selectedTechniques.length > 0) {
+        const techniqueIds = selectedTechniques.map(t => t.id).join(',');
+        const tacticNames = [...new Set(selectedTechniques.flatMap(t => t.tactics.map(tactic => tactic.name)))].join(',');
+        
+        modeling.updateProperties(element, {
+          'attack:techniques': techniqueIds,
+          'attack:tactics': tacticNames
+        });
+      }
+
+      setHasChanges(false);
+      alert('Task properties updated successfully!');
+    }
+  };
+
+  const handleCancel = () => {
+    // Reload properties from element
+    if (task && modeler) {
+      const elementRegistry = modeler.get('elementRegistry');
+      const element = elementRegistry.get(task.id);
+      
+      if (element) {
+        const businessObject = element.businessObject;
+        
+        setProperties({
+          name: businessObject.name || '',
+          role: businessObject.$attrs['irp:role'] || '',
+          tool: businessObject.$attrs['irp:tool'] || '',
+          evidence: businessObject.$attrs['irp:evidence'] || '',
+          phase: businessObject.$attrs['irp:phase'] || 'detection',
+          priority: businessObject.$attrs['irp:priority'] || 'medium',
+          estimatedTime: businessObject.$attrs['irp:estimatedTime'] || '',
+          notes: businessObject.$attrs['irp:notes'] || ''
+        });
+        setHasChanges(false);
+      }
+    }
   };
 
   if (!task) {
     return (
       <div className="task-properties-panel empty">
-        <p>Select a task to view properties</p>
+        <p>Select a task to edit properties</p>
+        <small>Click on any task in the diagram</small>
       </div>
     );
   }
@@ -133,9 +222,39 @@ const TaskPropertiesPanel = ({ task }) => {
         />
       </div>
 
+      {/* ATT&CK Techniques Display */}
+      {selectedTechniques && selectedTechniques.length > 0 && (
+        <div className="property-group">
+          <label>Mapped ATT&CK Techniques</label>
+          <div className="selected-techniques">
+            {selectedTechniques.map(technique => (
+              <div key={technique.id} className="technique-tag">
+                <span className="technique-id">{technique.id}</span>
+                <span className="technique-name">{technique.name}</span>
+              </div>
+            ))}
+          </div>
+          <small className="help-text">
+            Select techniques from the ATT&CK panel on the right
+          </small>
+        </div>
+      )}
+
       <div className="panel-actions">
-        <button className="btn btn-outline">Cancel</button>
-        <button className="btn btn-primary">Apply</button>
+        <button 
+          className="btn btn-outline" 
+          onClick={handleCancel}
+          disabled={!hasChanges}
+        >
+          Cancel
+        </button>
+        <button 
+          className="btn btn-primary" 
+          onClick={handleApply}
+          disabled={!hasChanges}
+        >
+          {hasChanges ? 'Apply Changes' : 'No Changes'}
+        </button>
       </div>
     </div>
   );

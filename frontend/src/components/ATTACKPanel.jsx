@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './ATTACKPanel.css';
 import { attackAPI } from '../services/apiService';
 
-const ATTACKPanel = ({ selectedTask }) => {
+const ATTACKPanel = ({ selectedTask, onTechniquesChange }) => {
   const [tactics, setTactics] = useState([]);
   const [techniques, setTechniques] = useState([]);
   const [selectedTactic, setSelectedTactic] = useState(null);
@@ -21,6 +21,13 @@ const ATTACKPanel = ({ selectedTask }) => {
       loadTechniques(selectedTactic);
     }
   }, [selectedTactic]);
+
+  // Notify parent when selected techniques change
+  useEffect(() => {
+    if (onTechniquesChange) {
+      onTechniquesChange(selectedTechniques);
+    }
+  }, [selectedTechniques, onTechniquesChange]);
 
   const loadTactics = async () => {
     setLoading(true);

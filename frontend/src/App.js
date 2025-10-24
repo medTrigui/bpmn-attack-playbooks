@@ -16,6 +16,9 @@ function App() {
   const [showLibrary, setShowLibrary] = useState(false);
   const [viewMode, setViewMode] = useState('editor'); // editor, incidents, execution
   const [selectedIncident, setSelectedIncident] = useState(null);
+  const [modelerInstance, setModelerInstance] = useState(null);
+  const [selectedTechniques, setSelectedTechniques] = useState([]);
+  const [activeTab, setActiveTab] = useState('properties'); // properties, attack
 
   useEffect(() => {
     // Check backend connection on mount
@@ -54,6 +57,14 @@ function App() {
     if (mode === 'editor') {
       setSelectedIncident(null);
     }
+  };
+
+  const handleModelerReady = (modeler) => {
+    setModelerInstance(modeler);
+  };
+
+  const handleTechniquesChange = (techniques) => {
+    setSelectedTechniques(techniques);
   };
 
   return (
@@ -124,24 +135,40 @@ function App() {
               <BPMNEditor 
                 onTaskSelect={handleTaskSelect}
                 currentPlaybook={currentPlaybook}
+                onModelerReady={handleModelerReady}
               />
             </main>
 
             <aside className="side-panel">
               <div className="panel-tabs">
-                <div className="tab active">Properties</div>
-                <div className="tab">ATT&CK</div>
+                <div 
+                  className={`tab ${activeTab === 'properties' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('properties')}
+                >
+                  Properties
+                </div>
+                <div 
+                  className={`tab ${activeTab === 'attack' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('attack')}
+                >
+                  ATT&CK
+                </div>
               </div>
               
-              {selectedTask ? (
-                <TaskPropertiesPanel task={selectedTask} />
-              ) : (
-                <div className="panel-empty">
-                  <p>Select a task to view properties</p>
-                </div>
+              {activeTab === 'properties' && (
+                <TaskPropertiesPanel 
+                  task={selectedTask} 
+                  modeler={modelerInstance}
+                  selectedTechniques={selectedTechniques}
+                />
               )}
               
-              <ATTACKPanel selectedTask={selectedTask} />
+              {activeTab === 'attack' && (
+                <ATTACKPanel 
+                  selectedTask={selectedTask}
+                  onTechniquesChange={handleTechniquesChange}
+                />
+              )}
             </aside>
           </>
         )}

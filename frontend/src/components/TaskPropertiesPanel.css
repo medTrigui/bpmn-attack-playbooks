@@ -6,10 +6,17 @@
 
 .task-properties-panel.empty {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   color: #9ca3af;
   font-size: 0.875rem;
+  gap: 0.5rem;
+}
+
+.task-properties-panel.empty small {
+  font-size: 0.75rem;
+  color: #d1d5db;
 }
 
 .panel-header {
@@ -117,6 +124,43 @@
   color: #ef4444;
 }
 
+.selected-techniques {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.technique-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+}
+
+.technique-id {
+  font-weight: 700;
+  color: #1e40af;
+  font-family: monospace;
+}
+
+.technique-name {
+  color: #374151;
+  flex: 1;
+}
+
+.help-text {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
 .panel-actions {
   display: flex;
   gap: 0.5rem;
@@ -129,5 +173,10 @@
   flex: 1;
   padding: 0.625rem;
   font-size: 0.875rem;
+}
+
+.panel-actions .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
