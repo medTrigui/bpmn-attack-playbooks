@@ -55,6 +55,7 @@ function EvidenceViewer({ incidentId, taskId }) {
         formData.append('url', url);
         formData.append('content', content);
       }
+
       formData.append('title', title || (file ? file.name : 'New Evidence'));
       formData.append('description', description);
       formData.append('collected_by', collectedBy || 'Unknown');
@@ -157,7 +158,12 @@ function EvidenceViewer({ incidentId, taskId }) {
             </div>
             <p className="evidence-description">{e.description}</p>
             {e.file_path && (
-              <a href={`http://localhost:5000/${e.file_path}`} className="download-link" target="_blank" rel="noreferrer">
+              <a
+                href={`/${e.file_path}`}
+                className="download-link"
+                target="_blank"
+                rel="noreferrer"
+              >
                 Download File
               </a>
             )}
