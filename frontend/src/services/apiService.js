@@ -150,27 +150,33 @@ export const incidentsAPI = {
 };
 
 export const evidenceAPI = {
+  // Fetch all evidence for a specific incident
   fetchByIncident: async (incidentId) => {
     const response = await axios.get(`${API_BASE_URL}/evidence/incident/${incidentId}`);
     return response.data;
   },
 
+  // Fetch all evidence for a specific task
   fetchByTask: async (taskId) => {
     const response = await axios.get(`${API_BASE_URL}/evidence/task/${taskId}`);
     return response.data;
   },
 
-  upload: async (formData) => {
+  // Upload new evidence (file, URL, note, etc.)
+  uploadEvidence: async (formData) => {
     const response = await axios.post(`${API_BASE_URL}/evidence/`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
     return response.data;
   },
 
-  delete: async (evidenceId) => {
+  // Delete evidence by ID
+  deleteEvidence: async (evidenceId) => {
     const response = await axios.delete(`${API_BASE_URL}/evidence/${evidenceId}`);
     return response.data;
-  }
+  },
 };
 
 const apiService = {
