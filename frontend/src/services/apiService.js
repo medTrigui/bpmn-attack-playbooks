@@ -95,11 +95,66 @@ export const validationAPI = {
   }
 };
 
+// Incidents API calls
+export const incidentsAPI = {
+  list: async (params = {}) => {
+    const response = await axios.get(`${API_BASE_URL}/incidents/`, { params });
+    return response.data;
+  },
+
+  get: async (incidentId) => {
+    const response = await axios.get(`${API_BASE_URL}/incidents/${incidentId}`);
+    return response.data;
+  },
+
+  create: async (incidentData) => {
+    const response = await axios.post(`${API_BASE_URL}/incidents/`, incidentData);
+    return response.data;
+  },
+
+  update: async (incidentId, updates) => {
+    const response = await axios.put(`${API_BASE_URL}/incidents/${incidentId}`, updates);
+    return response.data;
+  },
+
+  delete: async (incidentId) => {
+    const response = await axios.delete(`${API_BASE_URL}/incidents/${incidentId}`);
+    return response.data;
+  },
+
+  updateTask: async (incidentId, taskId, updates) => {
+    const response = await axios.put(
+      `${API_BASE_URL}/incidents/${incidentId}/tasks/${taskId}`,
+      updates
+    );
+    return response.data;
+  },
+
+  getTimeline: async (incidentId) => {
+    const response = await axios.get(`${API_BASE_URL}/incidents/${incidentId}/timeline`);
+    return response.data;
+  },
+
+  addEvidence: async (incidentId, evidenceData) => {
+    const response = await axios.post(
+      `${API_BASE_URL}/incidents/${incidentId}/evidence`,
+      evidenceData
+    );
+    return response.data;
+  },
+
+  getStatistics: async () => {
+    const response = await axios.get(`${API_BASE_URL}/incidents/statistics`);
+    return response.data;
+  }
+};
+
 const apiService = {
   checkBackendHealth,
   attack: attackAPI,
   playbooks: playbooksAPI,
-  validation: validationAPI
+  validation: validationAPI,
+  incidents: incidentsAPI
 };
 
 export default apiService;

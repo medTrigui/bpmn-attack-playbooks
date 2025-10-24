@@ -4,6 +4,8 @@ import BPMNEditor from './components/BPMNEditor';
 import ATTACKPanel from './components/ATTACKPanel';
 import PlaybookLibrary from './components/PlaybookLibrary';
 import TaskPropertiesPanel from './components/TaskPropertiesPanel';
+import IncidentDashboard from './components/IncidentDashboard';
+import ExecutionView from './components/ExecutionView';
 import { checkBackendHealth } from './services/apiService';
 
 function App() {
@@ -11,6 +13,8 @@ function App() {
   const [currentPlaybook, setCurrentPlaybook] = useState(null);
   const [backendStatus, setBackendStatus] = useState('checking');
   const [showLibrary, setShowLibrary] = useState(false);
+  const [viewMode, setViewMode] = useState('editor'); // editor, incidents, execution
+  const [selectedIncident, setSelectedIncident] = useState(null);
 
   useEffect(() => {
     // Check backend connection on mount
@@ -31,6 +35,24 @@ function App() {
   const handleNewPlaybook = () => {
     setCurrentPlaybook(null);
     setSelectedTask(null);
+    setViewMode('editor');
+  };
+
+  const handleIncidentSelect = (incident) => {
+    setSelectedIncident(incident);
+    setViewMode('execution');
+  };
+
+  const handleBackToDashboard = () => {
+    setSelectedIncident(null);
+    setViewMode('incidents');
+  };
+
+  const handleViewChange = (mode) => {
+    setViewMode(mode);
+    if (mode === 'editor') {
+      setSelectedIncident(null);
+    }
   };
 
   return (
@@ -40,19 +62,39 @@ function App() {
           <h1>BPMN Attack Playbooks</h1>
           <span className="subtitle">Incident Response + MITRE ATT&CK</span>
         </div>
+        <div className="header-center">
+          <nav className="view-navigation">
+            <button
+              className={`nav-btn ${viewMode === 'editor' ? 'active' : ''}`}
+              onClick={() => handleViewChange('editor')}
+            >
+              📝 Playbook Editor
+            </button>
+            <button
+              className={`nav-btn ${viewMode === 'incidents' || viewMode === 'execution' ? 'active' : ''}`}
+              onClick={() => handleViewChange('incidents')}
+            >
+              🚨 Incidents
+            </button>
+          </nav>
+        </div>
         <div className="header-right">
-          <button 
-            className="btn btn-secondary"
-            onClick={() => setShowLibrary(!showLibrary)}
-          >
-            {showLibrary ? 'Close Library' : 'Open Library'}
-          </button>
-          <button 
-            className="btn btn-primary"
-            onClick={handleNewPlaybook}
-          >
-            New Playbook
-          </button>
+          {viewMode === 'editor' && (
+            <>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowLibrary(!showLibrary)}
+              >
+                {showLibrary ? 'Close Library' : 'Open Library'}
+              </button>
+              <button 
+                className="btn btn-primary"
+                onClick={handleNewPlaybook}
+              >
+                New Playbook
+              </button>
+            </>
+          )}
           <div className={`status-indicator ${backendStatus}`}>
             <span className="status-dot"></span>
             {backendStatus === 'connected' ? 'Connected' : 
@@ -62,35 +104,57 @@ function App() {
       </header>
 
       <div className="app-body">
-        {showLibrary && (
-          <aside className="library-sidebar">
-            <PlaybookLibrary onPlaybookLoad={handlePlaybookLoad} />
-          </aside>
+        {/* Playbook Editor View */}
+        {viewMode === 'editor' && (
+          <>
+            {showLibrary && (
+              <aside className="library-sidebar">
+                <PlaybookLibrary onPlaybookLoad={handlePlaybookLoad} />
+              </aside>
+            )}
+
+            <main className="editor-container">
+              <BPMNEditor 
+                onTaskSelect={handleTaskSelect}
+                currentPlaybook={currentPlaybook}
+              />
+            </main>
+
+            <aside className="side-panel">
+              <div className="panel-tabs">
+                <div className="tab active">Properties</div>
+                <div className="tab">ATT&CK</div>
+              </div>
+              
+              {selectedTask ? (
+                <TaskPropertiesPanel task={selectedTask} />
+              ) : (
+                <div className="panel-empty">
+                  <p>Select a task to view properties</p>
+                </div>
+              )}
+              
+              <ATTACKPanel selectedTask={selectedTask} />
+            </aside>
+          </>
         )}
 
-        <main className="editor-container">
-          <BPMNEditor 
-            onTaskSelect={handleTaskSelect}
-            currentPlaybook={currentPlaybook}
-          />
-        </main>
+        {/* Incidents Dashboard View */}
+        {viewMode === 'incidents' && (
+          <main className="main-content">
+            <IncidentDashboard onIncidentSelect={handleIncidentSelect} />
+          </main>
+        )}
 
-        <aside className="side-panel">
-          <div className="panel-tabs">
-            <div className="tab active">Properties</div>
-            <div className="tab">ATT&CK</div>
-          </div>
-          
-          {selectedTask ? (
-            <TaskPropertiesPanel task={selectedTask} />
-          ) : (
-            <div className="panel-empty">
-              <p>Select a task to view properties</p>
-            </div>
-          )}
-          
-          <ATTACKPanel selectedTask={selectedTask} />
-        </aside>
+        {/* Incident Execution View */}
+        {viewMode === 'execution' && selectedIncident && (
+          <main className="main-content">
+            <ExecutionView 
+              incident={selectedIncident} 
+              onBack={handleBackToDashboard}
+            />
+          </main>
+        )}
       </div>
     </div>
   );
