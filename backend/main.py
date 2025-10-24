@@ -15,6 +15,7 @@ from flask_cors import CORS
 from api.attack import attack_bp
 from api.playbooks import playbooks_bp
 from api.validation import validation_bp
+from api.evidence import evidence_bp
 
 # Try to import database - may fail on Python 3.13
 try:
@@ -39,6 +40,7 @@ if DB_AVAILABLE:
 app.register_blueprint(attack_bp, url_prefix='/api/attack')
 app.register_blueprint(playbooks_bp, url_prefix='/api/playbooks')
 app.register_blueprint(validation_bp, url_prefix='/api/validation')
+app.register_blueprint(evidence_bp, url_prefix='/api/evidence')
 
 # Register incidents blueprint only if database is available
 if DB_AVAILABLE:

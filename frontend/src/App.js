@@ -6,6 +6,7 @@ import PlaybookLibrary from './components/PlaybookLibrary';
 import TaskPropertiesPanel from './components/TaskPropertiesPanel';
 import IncidentDashboard from './components/IncidentDashboard';
 import ExecutionView from './components/ExecutionView';
+import EvidenceViewer from './components/EvidenceViewer';
 import { checkBackendHealth } from './services/apiService';
 
 function App() {
@@ -75,6 +76,12 @@ function App() {
               onClick={() => handleViewChange('incidents')}
             >
               Incidents
+            </button>
+            <button
+              className={`nav-btn ${viewMode === 'evidence' ? 'active' : ''}`}
+              onClick={() => handleViewChange('evidence')}
+            >
+              Evidence
             </button>
           </nav>
         </div>
@@ -152,6 +159,15 @@ function App() {
             <ExecutionView 
               incident={selectedIncident} 
               onBack={handleBackToDashboard}
+            />
+          </main>
+        )}
+        {/* Evidence View */}
+        {viewMode === 'evidence' && (
+          <main className="main-content">
+            <EvidenceViewer 
+              incidentId={selectedIncident?.id} 
+              taskId={selectedTask?.id} 
             />
           </main>
         )}
