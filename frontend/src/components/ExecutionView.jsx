@@ -18,6 +18,13 @@ const ExecutionView = ({ incident, onBack }) => {
     content: '',
     url: ''
   });
+  
+  // Task editing state
+  const [taskEdits, setTaskEdits] = useState({
+    notes: '',
+    findings: '',
+    actions_taken: ''
+  });
 
   useEffect(() => {
     if (incident) {
@@ -60,10 +67,44 @@ const ExecutionView = ({ incident, onBack }) => {
         updated_by: 'user'
       });
       loadIncidentData();
-      setSelectedTask(null);
+      // Don't close the task - keep it open
     } catch (error) {
       console.error('Error updating task:', error);
       alert('Failed to update task');
+    }
+  };
+
+  const handleTaskSelect = (task) => {
+    if (selectedTask?.id === task.id) {
+      // Collapse if clicking same task
+      setSelectedTask(null);
+    } else {
+      // Expand new task
+      setSelectedTask(task);
+      // Initialize edit fields with current values
+      setTaskEdits({
+        notes: task.notes || '',
+        findings: task.findings || '',
+        actions_taken: task.actions_taken || ''
+      });
+    }
+  };
+
+  const handleSaveTaskDetails = async () => {
+    if (!selectedTask) return;
+    
+    try {
+      await incidentsAPI.updateTask(incident.id, selectedTask.id, {
+        notes: taskEdits.notes,
+        findings: taskEdits.findings,
+        actions_taken: taskEdits.actions_taken,
+        updated_by: 'user'
+      });
+      alert('✓ Task details saved successfully');
+      loadIncidentData();
+    } catch (error) {
+      console.error('Error saving task details:', error);
+      alert('Failed to save task details');
     }
   };
 
@@ -105,14 +146,14 @@ const ExecutionView = ({ incident, onBack }) => {
 
   const getStatusIcon = (status) => {
     const icons = {
-      pending: '⏳',
-      in_progress: '▶️',
-      completed: '✅',
-      skipped: '⏭️',
-      blocked: '🚫',
-      failed: '❌'
+      pending: '○',
+      in_progress: '◐',
+      completed: '●',
+      skipped: '⊘',
+      blocked: '✖',
+      failed: '✖'
     };
-    return icons[status] || '❓';
+    return icons[status] || '○';
   };
 
   const getTasksByPhase = () => {
@@ -157,8 +198,8 @@ const ExecutionView = ({ incident, onBack }) => {
             <span className={`severity-badge severity-${incidentData.severity}`}>
               {incidentData.severity}
             </span>
-            <span>📋 {incidentData.playbook_name}</span>
-            {incidentData.assigned_to && <span>👤 {incidentData.assigned_to}</span>}
+            <span className="info-playbook">{incidentData.playbook_name}</span>
+            {incidentData.assigned_to && <span className="info-assignee">{incidentData.assigned_to}</span>}
           </div>
         </div>
         <div className="incident-actions">
@@ -239,24 +280,29 @@ const ExecutionView = ({ incident, onBack }) => {
                   {phaseTasks.map(task => (
                     <div
                       key={task.id}
-                      className={`task-item ${task.status}`}
-                      onClick={() => setSelectedTask(selectedTask?.id === task.id ? null : task)}
+                      className={`task-item ${task.status} ${selectedTask?.id === task.id ? 'expanded' : ''}`}
+                      onClick={() => handleTaskSelect(task)}
                     >
                       <div className="task-header">
                         <div className="task-status-icon">
                           {getStatusIcon(task.status)}
                         </div>
                         <div className="task-info">
-                          <h4>{task.task_name}</h4>
+                          <h4>
+                            {task.task_name}
+                            <span className="expand-indicator">
+                              {selectedTask?.id === task.id ? '▼' : '▶'}
+                            </span>
+                          </h4>
                           <div className="task-meta">
-                            {task.role && <span>👤 {task.role}</span>}
-                            {task.tool && <span>🔧 {task.tool}</span>}
+                            {task.role && <span className="meta-role">{task.role}</span>}
+                            {task.tool && <span className="meta-tool">{task.tool}</span>}
                             {task.priority && (
                               <span className={`priority-${task.priority}`}>
-                                ⚡ {task.priority}
+                                {task.priority}
                               </span>
                             )}
-                            {task.estimated_time && <span>⏱️ {task.estimated_time}</span>}
+                            {task.estimated_time && <span className="meta-time">{task.estimated_time}</span>}
                           </div>
                         </div>
                         <div className="task-actions">
@@ -287,14 +333,24 @@ const ExecutionView = ({ incident, onBack }) => {
 
                       {/* Expanded Task Details */}
                       {selectedTask?.id === task.id && (
-                        <div className="task-details">
+                        <div className="task-details" onClick={(e) => e.stopPropagation()}>
                           <div className="task-details-section">
                             <h5>ATT&CK Mappings</h5>
                             {task.attack_techniques && task.attack_techniques.length > 0 ? (
-                              <div className="attack-techniques">
-                                {task.attack_techniques.map(tech => (
-                                  <span key={tech} className="attack-badge">{tech}</span>
-                                ))}
+                              <div className="attack-mappings">
+                                {task.attack_techniques.map((tech, idx) => {
+                                  const tactic = task.attack_tactics && task.attack_tactics[idx];
+                                  return (
+                                    <div key={`${tech}-${idx}`} className="attack-mapping-item">
+                                      <span className="attack-technique-badge">{tech}</span>
+                                      {tactic && (
+                                        <span className="attack-tactic-badge">
+                                          {tactic}
+                                        </span>
+                                      )}
+                                    </div>
+                                  );
+                                })}
                               </div>
                             ) : (
                               <p className="no-data">No ATT&CK mappings</p>
@@ -305,8 +361,10 @@ const ExecutionView = ({ incident, onBack }) => {
                             <h5>Notes</h5>
                             <textarea
                               placeholder="Add execution notes..."
-                              defaultValue={task.notes}
-                              onBlur={(e) => handleTaskUpdate(task.id, { notes: e.target.value })}
+                              value={taskEdits.notes}
+                              onChange={(e) => setTaskEdits({ ...taskEdits, notes: e.target.value })}
+                              onClick={(e) => e.stopPropagation()}
+                              rows="4"
                             />
                           </div>
 
@@ -314,8 +372,10 @@ const ExecutionView = ({ incident, onBack }) => {
                             <h5>Findings</h5>
                             <textarea
                               placeholder="Document findings..."
-                              defaultValue={task.findings}
-                              onBlur={(e) => handleTaskUpdate(task.id, { findings: e.target.value })}
+                              value={taskEdits.findings}
+                              onChange={(e) => setTaskEdits({ ...taskEdits, findings: e.target.value })}
+                              onClick={(e) => e.stopPropagation()}
+                              rows="4"
                             />
                           </div>
 
@@ -323,9 +383,24 @@ const ExecutionView = ({ incident, onBack }) => {
                             <h5>Actions Taken</h5>
                             <textarea
                               placeholder="What actions were performed..."
-                              defaultValue={task.actions_taken}
-                              onBlur={(e) => handleTaskUpdate(task.id, { actions_taken: e.target.value })}
+                              value={taskEdits.actions_taken}
+                              onChange={(e) => setTaskEdits({ ...taskEdits, actions_taken: e.target.value })}
+                              onClick={(e) => e.stopPropagation()}
+                              rows="4"
                             />
+                          </div>
+
+                          {/* Save Button */}
+                          <div className="task-details-section save-section">
+                            <button
+                              className="btn btn-primary btn-save"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSaveTaskDetails();
+                              }}
+                            >
+                              Save Changes
+                            </button>
                           </div>
 
                           <div className="task-details-actions">
@@ -368,10 +443,10 @@ const ExecutionView = ({ incident, onBack }) => {
             {timeline.length === 0 ? (
               <div className="empty-state">No timeline events yet</div>
             ) : (
-              <div className="timeline-list">
+                <div className="timeline-list">
                 {timeline.map(event => (
                   <div key={event.id} className="timeline-event">
-                    <div className="timeline-icon">{event.event_type === 'incident_created' ? '🎬' : '📌'}</div>
+                    <div className="timeline-icon">•</div>
                     <div className="timeline-content">
                       <div className="timeline-header">
                         <h4>{event.title}</h4>
@@ -409,9 +484,9 @@ const ExecutionView = ({ incident, onBack }) => {
                 {evidence.map(item => (
                   <div key={item.id} className="evidence-item">
                     <div className="evidence-icon">
-                      {item.evidence_type === 'file' ? '📎' :
-                       item.evidence_type === 'screenshot' ? '📸' :
-                       item.evidence_type === 'url' ? '🔗' : '📝'}
+                      <span className={`evidence-type-${item.evidence_type}`}>
+                        {item.evidence_type.charAt(0).toUpperCase()}
+                      </span>
                     </div>
                     <div className="evidence-content">
                       <h4>{item.title}</h4>

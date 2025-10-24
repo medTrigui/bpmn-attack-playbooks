@@ -191,6 +191,24 @@
   gap: 5px;
 }
 
+.meta-playbook::before {
+  content: "Playbook: ";
+  font-weight: 600;
+  color: #495057;
+}
+
+.meta-assignee::before {
+  content: "Assigned: ";
+  font-weight: 600;
+  color: #495057;
+}
+
+.meta-date::before {
+  content: "Created: ";
+  font-weight: 600;
+  color: #495057;
+}
+
 .incident-progress {
   margin-bottom: 15px;
 }

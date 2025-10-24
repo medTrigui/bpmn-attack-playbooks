@@ -44,6 +44,18 @@
   font-size: 14px;
 }
 
+.info-playbook::before {
+  content: "Playbook: ";
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.info-assignee::before {
+  content: "Assigned: ";
+  font-weight: 600;
+  opacity: 0.8;
+}
+
 .incident-actions {
   display: flex;
   gap: 10px;
@@ -209,6 +221,12 @@
   box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
 }
 
+.task-item.expanded {
+  border-color: #3498db;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25);
+  background: #f8fcff;
+}
+
 .task-item.in_progress {
   border-left: 4px solid #f39c12;
   background: #fffbf0;
@@ -232,8 +250,33 @@
 }
 
 .task-status-icon {
-  font-size: 24px;
+  font-size: 20px;
   flex-shrink: 0;
+  font-weight: 700;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f8f9fa;
+}
+
+.task-item.pending .task-status-icon {
+  color: #6c757d;
+}
+
+.task-item.in_progress .task-status-icon {
+  color: #f39c12;
+}
+
+.task-item.completed .task-status-icon {
+  color: #27ae60;
+}
+
+.task-item.blocked .task-status-icon,
+.task-item.failed .task-status-icon {
+  color: #e74c3c;
 }
 
 .task-info {
@@ -244,6 +287,25 @@
   margin: 0 0 8px 0;
   color: #2c3e50;
   font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.expand-indicator {
+  font-size: 12px;
+  color: #3498db;
+  opacity: 0.7;
+  transition: all 0.2s;
+}
+
+.task-item.expanded .expand-indicator {
+  opacity: 1;
+  transform: rotate(0deg);
+}
+
+.task-item:not(.expanded) .expand-indicator {
+  transform: rotate(-90deg);
 }
 
 .task-meta {
@@ -252,6 +314,24 @@
   gap: 12px;
   font-size: 13px;
   color: #6c757d;
+}
+
+.meta-role::before {
+  content: "Role: ";
+  font-weight: 600;
+  color: #495057;
+}
+
+.meta-tool::before {
+  content: "Tool: ";
+  font-weight: 600;
+  color: #495057;
+}
+
+.meta-time::before {
+  content: "Est. Time: ";
+  font-weight: 600;
+  color: #495057;
 }
 
 .task-meta span.priority-high,
@@ -309,6 +389,46 @@
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
+.attack-mappings {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.attack-mapping-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #3498db;
+}
+
+.attack-technique-badge {
+  padding: 4px 10px;
+  background: #e8f4fd;
+  color: #3498db;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid #3498db;
+  font-family: 'Courier New', monospace;
+  min-width: 70px;
+  text-align: center;
+}
+
+.attack-tactic-badge {
+  padding: 4px 12px;
+  background: #fff3cd;
+  color: #856404;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid #ffc107;
+}
+
+/* Legacy support for old attack-techniques class */
 .attack-techniques {
   display: flex;
   flex-wrap: wrap;
@@ -325,11 +445,33 @@
   border: 1px solid #3498db;
 }
 
+.save-section {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0 10px 0;
+  border-top: 2px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.btn-save {
+  padding: 12px 30px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
 .task-details-actions {
   display: flex;
   gap: 10px;
   padding-top: 15px;
-  border-top: 1px solid #e9ecef;
 }
 
 .no-data {
@@ -366,12 +508,14 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: #e8f4fd;
+  background: #3498db;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 20px;
+  font-weight: 700;
+  color: white;
 }
 
 .timeline-content {
@@ -450,7 +594,36 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 18px;
+  font-weight: 700;
+  border: 2px solid #3498db;
+  color: #3498db;
+}
+
+.evidence-type-file {
+  background: #e8f4fd;
+}
+
+.evidence-type-screenshot {
+  background: #e8f4fd;
+}
+
+.evidence-type-url {
+  background: #e8f4fd;
+}
+
+.evidence-type-note {
+  background: #e8f4fd;
+}
+
+.evidence-type-log {
+  background: #e8f4fd;
+}
+
+.evidence-type-ioc {
+  background: #fef3cd;
+  border-color: #f39c12;
+  color: #f39c12;
 }
 
 .evidence-content {

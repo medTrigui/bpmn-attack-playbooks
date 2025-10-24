@@ -215,16 +215,16 @@ const IncidentDashboard = ({ onIncidentSelect }) => {
                   </div>
                 </div>
                 <div className="incident-meta">
-                  <span className="meta-item">
-                    📋 {incident.playbook_name || incident.playbook_id}
+                  <span className="meta-item meta-playbook">
+                    {incident.playbook_name || incident.playbook_id}
                   </span>
                   {incident.assigned_to && (
-                    <span className="meta-item">
-                      👤 {incident.assigned_to}
+                    <span className="meta-item meta-assignee">
+                      {incident.assigned_to}
                     </span>
                   )}
-                  <span className="meta-item">
-                    🕐 {formatDate(incident.created_at)}
+                  <span className="meta-item meta-date">
+                    {formatDate(incident.created_at)}
                   </span>
                 </div>
               </div>
@@ -250,7 +250,7 @@ const IncidentDashboard = ({ onIncidentSelect }) => {
 
               <div className="incident-footer">
                 <div className="incident-duration">
-                  ⏱️ {calculateDuration(incident.started_at, incident.completed_at)}
+                  Duration: {calculateDuration(incident.started_at, incident.completed_at)}
                 </div>
                 <button
                   className="btn-icon delete"
@@ -260,7 +260,7 @@ const IncidentDashboard = ({ onIncidentSelect }) => {
                   }}
                   title="Cancel Incident"
                 >
-                  ❌
+                  ×
                 </button>
               </div>
             </div>

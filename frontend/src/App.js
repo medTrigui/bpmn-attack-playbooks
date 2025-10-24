@@ -68,13 +68,13 @@ function App() {
               className={`nav-btn ${viewMode === 'editor' ? 'active' : ''}`}
               onClick={() => handleViewChange('editor')}
             >
-              📝 Playbook Editor
+              Playbook Editor
             </button>
             <button
               className={`nav-btn ${viewMode === 'incidents' || viewMode === 'execution' ? 'active' : ''}`}
               onClick={() => handleViewChange('incidents')}
             >
-              🚨 Incidents
+              Incidents
             </button>
           </nav>
         </div>
