@@ -85,14 +85,12 @@ const BPMNEditor = ({ onTaskSelect, currentPlaybook, onModelerReady }) => {
       
       if (currentPlaybook.bpmn_xml) {
         modelerRef.current.importXML(currentPlaybook.bpmn_xml)
-    .then(() => {
-      console.log('Playbook loaded successfully');
-      const eventBus = modelerRef.current.get('eventBus');
-      eventBus.once('import.done', () => {
-        const canvas = modelerRef.current.get('canvas');
-        if (canvas) canvas.zoom('fit-viewport');
-      });
-    })
+          .then(() => {
+            console.log('Playbook loaded successfully');
+            // Zoom to fit
+            const canvas = modelerRef.current.get('canvas');
+            canvas.zoom('fit-viewport');
+          })
           .catch(err => {
             console.error('Error loading playbook:', err);
             alert(`Failed to load playbook: ${err.message}`);
@@ -173,14 +171,12 @@ const BPMNEditor = ({ onTaskSelect, currentPlaybook, onModelerReady }) => {
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>`;
 
+      setPlaybookName('');
       modelerRef.current.importXML(initialDiagram)
         .then(() => {
           console.log('New playbook created');
-          const eventBus = modelerRef.current.get('eventBus');
-          eventBus.once('import.done', () => {
-            const canvas = modelerRef.current.get('canvas');
-            if (canvas) canvas.zoom('fit-viewport');
-          });
+          const canvas = modelerRef.current.get('canvas');
+          canvas.zoom('fit-viewport');
         })
         .catch(err => {
           console.error('Error creating new playbook:', err);
