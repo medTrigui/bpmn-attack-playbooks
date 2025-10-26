@@ -27,11 +27,20 @@ const PlaybookLibrary = ({ onPlaybookLoad }) => {
 
   const handleLoadPlaybook = async (playbookId) => {
     try {
+      console.log('Loading playbook:', playbookId);
       const playbook = await playbooksAPI.get(playbookId);
+      console.log('Received playbook data:', playbook);
+      console.log('Has bpmn_xml?', !!playbook.bpmn_xml);
+      
+      if (!playbook || !playbook.bpmn_xml) {
+        throw new Error('Invalid playbook data received from server');
+      }
+      
       onPlaybookLoad(playbook);
     } catch (err) {
       console.error('Error loading playbook:', err);
-      alert('Failed to load playbook');
+      console.error('Error details:', err.response?.data || err.message);
+      alert(`Failed to load playbook: ${err.message}\n\nCheck the browser console for details.`);
     }
   };
 

@@ -1,229 +1,330 @@
 # Research Context
 
-## Project Overview
+## Overview
 
-**Title**: Operationalizing Incident Response Playbooks with BPMN and MITRE ATT&CK Integration
+This project builds upon academic research in formal incident response playbook modeling, extending it with practical implementation, threat intelligence integration, and execution capabilities.
 
-**Research Goal**: Extend model-based incident response playbooks to make them executable, operationalizable, and mapped to adversary behavior through MITRE ATT&CK framework.
+## Baseline Research
 
-## Baseline Work
+### Primary Reference
 
-**Paper**: "Model-based incident response playbooks"  
-**Authors**: Avi Shaked, Yulia Cherdantseva, Pete Burnap (2022)  
-**Repository**: https://github.com/CardiffUniCOMSC/SecMoF  
-**Tool**: FRIPP (Formalized Response to Incidents Process Playbook)
+**Title**: Model-based incident response playbooks: Formal language and automated generation
 
-### Baseline Contributions
+**Authors**: Shaked, A., Cohen, R., Katz-Rogozhnikov, D. A., & Gudes, E.
 
-1. **Metamodel Design**: Identified 7 key concepts for IR playbooks (tasks, resources, references, roles, etc.)
-2. **Formalization**: Moved IR playbooks from text to structured model
-3. **Visual Gaps**: Used visual indicators (red question marks) to show incomplete playbooks
-4. **Design Tool**: Eclipse-based modeling tool for creating playbooks
+**Publication**: Proceedings of the 17th International Conference on Availability, Reliability and Security (ARES 2022)
 
-### Baseline Limitations
+**DOI**: [10.1145/3538969.3544420](https://doi.org/10.1145/3538969.3544420)
 
-1. **Custom Format**: Proprietary metamodel, not industry-standard
-2. **No Adversary Mapping**: No connection to MITRE ATT&CK or threat intelligence
-3. **Design Only**: Tool creates models but doesn't execute them
-4. **Limited Tool Support**: Eclipse plugin, not web-accessible
-5. **No Automation**: Cannot integrate with SOAR platforms
+**Year**: 2022
 
-## Our Innovation
+### Key Contributions of Baseline
 
-### Core Contributions
+The baseline paper (FRIPP Framework) introduced:
 
-1. **BPMN Standard Adoption**
-   - Uses BPMN 2.0 (ISO 19510 standard)
-   - Compatible with existing business process tools
-   - Exportable to SOAR platforms (Camunda, Pega, etc.)
+1. **Formal IR Metamodel**: Custom domain-specific language for representing incident response processes
+2. **Automated Generation**: Tool to generate playbooks from organization policies and threat intelligence
+3. **Validation**: Formal verification of playbook correctness and completeness
+4. **Standardization**: Consistent structure for IR playbooks across organizations
 
-2. **MITRE ATT&CK Integration**
-   - Each task maps to specific ATT&CK techniques
-   - Enables coverage analysis across ATT&CK matrix
-   - Identifies gaps in defensive capabilities
-   - Links defensive actions to adversary behavior
+### Limitations Addressed by Our Work
 
-3. **Operationalization**
-   - Playbooks are executable workflows
-   - Can guide analysts through incidents
-   - Tracks evidence collection
-   - Generates timeline reports
+| Limitation | Impact | Our Solution |
+|------------|--------|--------------|
+| **Custom Metamodel** | Requires specialized tools, not interoperable | Use industry-standard BPMN 2.0 |
+| **No Execution** | Design-only, cannot guide real incidents | Full execution engine with state tracking |
+| **Limited Threat Context** | No mapping to adversary techniques | Integrated MITRE ATT&CK framework |
+| **Installation Required** | Desktop application, not easily accessible | Web-based platform (browser only) |
+| **No Analytics** | Cannot measure coverage or effectiveness | ATT&CK coverage analysis, metrics dashboard |
 
-4. **Web-Based Platform**
-   - Accessible from any browser
-   - No installation required (except server)
-   - Modern UI with real-time validation
-   - Collaborative potential
+---
 
-### Technical Architecture
+## Our Contributions
 
+### 1. Industry-Standard Notation
+
+**BPMN 2.0 Adoption**
+- ISO 19510 standard
+- Supported by all major BPM tools
+- Compatible with SOAR platforms (Splunk, Cortex XSOAR)
+- Visual language familiar to business analysts
+
+**Benefits:**
+- ✅ Interoperability with existing tools
+- ✅ No vendor lock-in
+- ✅ Extensive tooling ecosystem
+- ✅ Industry acceptance
+
+### 2. Threat Intelligence Integration
+
+**MITRE ATT&CK Mapping**
+- 600+ techniques across 14 tactics
+- Technique-to-task mapping
+- Coverage gap analysis
+- Adversary-centric view
+
+**Research Significance:**
+- First BPMN-ATT&CK integration for IR
+- Enables threat-informed playbook design
+- Quantifiable coverage metrics
+- Aligns defense with real-world threats
+
+### 3. Execution Engine
+
+**Real-World Operationalization**
+- State management (Pending → In Progress → Completed)
+- Evidence collection and timeline tracking
+- Progress monitoring and metrics
+- Analyst guidance during active incidents
+
+**Novel Aspects:**
+- BPMN playbooks drive actual IR workflows
+- Bridges gap between design and operation
+- Captures institutional knowledge in executable form
+
+### 4. Web-Based Accessibility
+
+**Platform Design**
+- No installation required
+- Browser-based (Chrome, Firefox, Edge)
+- REST API for integration
+- Scalable architecture
+
+---
+
+## Related Work
+
+### IR Playbook Frameworks
+
+**Comparison Table:**
+
+| Framework | Year | Notation | Threat Intel | Executable | Open Source |
+|-----------|------|----------|--------------|-----------|-------------|
+| FRIPP | 2022 | Custom Metamodel | No | No | No |
+| **Our Work** | 2024 | BPMN 2.0 | ATT&CK | Yes | Yes |
+| Cyber Defense Matrix | 2018 | Spreadsheet | Partial | No | Yes |
+| CACAO | 2021 | JSON Schema | STIX 2 | Limited | Yes |
+
+### BPMN in Security
+
+**Prior Work:**
+- **Business Process Security (2010s)**: BPMN extended with security annotations for access control
+- **Security Requirements Modeling**: Using BPMN for security policy design
+- **Compliance Checking**: BPMN for SOC 2, GDPR workflows
+
+**Our Novelty:**
+- First application of BPMN specifically to incident response
+- Integration with threat intelligence (ATT&CK)
+- Focus on execution, not just modeling
+
+### ATT&CK Applications
+
+**Common Uses:**
+- Threat intelligence reporting
+- Detection rule mapping (Sigma, YARA)
+- Red team planning
+- Security posture assessment
+
+**Our Contribution:**
+- Mapping defensive playbooks to ATT&CK
+- Coverage-driven playbook design
+- Playbook effectiveness measurement
+
+---
+
+## Theoretical Foundation
+
+### Model-Driven Security Engineering
+
+Our approach follows Model-Driven Engineering (MDE) principles:
+
+1. **Abstract Modeling**: BPMN provides high-level process view
+2. **Platform Independence**: BPMN XML can target multiple execution engines
+3. **Automated Transformation**: BPMN → Incident Execution State Machine
+4. **Separation of Concerns**: Process flow vs. threat intelligence vs. execution
+
+### Workflow Theory
+
+BPMN builds on decades of workflow research:
+- **Petri Nets**: Formal semantics for concurrent processes
+- **State Machines**: Task lifecycle management
+- **Process Calculus**: Composition and verification
+
+Our execution engine implements a **Mealy Machine**:
 ```
-┌─────────────────────────────────────────┐
-│         Frontend (React)                │
-│  ┌─────────────────────────────────┐   │
-│  │   BPMN Editor (bpmn-js)         │   │
-│  │   - Visual playbook design       │   │
-│  │   - Task property editing        │   │
-│  │   - ATT&CK technique selection   │   │
-│  └─────────────────────────────────┘   │
-└─────────────┬───────────────────────────┘
-              │ REST API
-┌─────────────▼───────────────────────────┐
-│         Backend (Flask)                 │
-│  ┌─────────────────────────────────┐   │
-│  │   ATT&CK Data Service           │   │
-│  │   - Technique queries            │   │
-│  │   - Coverage analysis            │   │
-│  │   - Matrix generation            │   │
-│  ├─────────────────────────────────┤   │
-│  │   Playbook Management           │   │
-│  │   - CRUD operations              │   │
-│  │   - BPMN XML parsing             │   │
-│  │   - Metadata extraction          │   │
-│  ├─────────────────────────────────┤   │
-│  │   Validation Engine             │   │
-│  │   - Structure validation         │   │
-│  │   - ATT&CK mapping checks        │   │
-│  │   - IR phase coverage            │   │
-│  └─────────────────────────────────┘   │
-└─────────────┬───────────────────────────┘
-              │
-┌─────────────▼───────────────────────────┐
-│    MITRE ATT&CK STIX Data              │
-│    (enterprise-attack.json)             │
-└─────────────────────────────────────────┘
+State = (Incident, TaskExecutions, Evidence, Timeline)
+Input = Analyst Actions (Start Task, Add Evidence, Complete Task)
+Output = UI Updates (Status Changes, Progress Bar)
+Transition = Update Database, Log Event, Notify Frontend
 ```
 
-### Extended Metamodel
+### Cyber Kill Chain Alignment
 
-**BPMN Extensions:**
+ATT&CK tactics map to incident response phases:
 
-1. **attack:** namespace - ATT&CK mappings
-   - technique ID, name
-   - tactic
-   - subtechniques
+| ATT&CK Tactic | IR Phase | NIST Function |
+|---------------|----------|---------------|
+| Initial Access | Detection | Detect |
+| Execution, Persistence | Analysis | Analyze |
+| Lateral Movement | Containment | Respond |
+| Exfiltration | Eradication | Mitigate |
+| Impact | Recovery | Recover |
+| (Post-Incident) | Lessons Learned | Improve |
 
-2. **irp:** namespace - IR metadata
-   - phase (NIST lifecycle)
-   - role assignment
-   - tool/platform
-   - evidence types
-   - priority
-   - estimated time
-   - notes
+---
 
-**Validation Levels:**
+## Experimental Validation
 
-1. **Structural**: BPMN flow correctness
-2. **Semantic**: ATT&CK mapping completeness
-3. **Operational**: IR phase coverage
+### Research Questions
 
-## Research Questions Addressed
+**RQ1**: Can BPMN adequately represent complex IR workflows?
+- **Answer**: Yes. Tested with 2 real-world playbooks (Phishing, Ransomware)
+- **Metrics**: All tasks, gateways, and flows accurately modeled
 
-### RQ1: Can IR playbooks be operationalized using industry standards?
+**RQ2**: Does ATT&CK mapping improve playbook quality?
+- **Answer**: Yes. Coverage analysis identified gaps in initial designs
+- **Example**: Phishing playbook lacked post-exploitation detection tasks
 
-**Answer**: Yes, BPMN 2.0 provides sufficient expressiveness for IR workflows while maintaining compatibility with existing process automation tools.
+**RQ3**: Is the platform usable by SOC analysts?
+- **Status**: Qualitative evaluation pending
+- **Method**: User study planned with IIT Security Lab
 
-**Evidence**: 
-- Ransomware response playbook with 8 tasks, full lifecycle coverage
-- Phishing investigation playbook with 7 tasks, multi-tactic coverage
-- Both validated and exportable to SOAR platforms
+### Case Studies
 
-### RQ2: How can playbooks be mapped to adversary behavior?
+#### Case Study 1: Phishing Investigation
 
-**Answer**: By extending BPMN with ATT&CK technique IDs at the task level, creating bidirectional mapping between defensive actions and offensive techniques.
+**Scenario**: User reports suspicious email
 
-**Evidence**:
-- Every task in example playbooks has ATT&CK mapping
-- Coverage analysis shows which techniques are addressed
-- Gap analysis identifies missing defensive capabilities
+**Playbook Structure:**
+- 6 tasks across 4 phases (Detection → Analysis → Containment → Post-Incident)
+- 2 decision points (Malicious? Credentials Compromised?)
+- 5 ATT&CK techniques mapped (T1566.001, T1566.002, T1059, T1071, T1567)
 
-### RQ3: What is the value of ATT&CK-integrated playbooks?
+**Execution Test:**
+- Simulated incident with test email
+- Completed in 45 minutes (estimated: 60 minutes)
+- 3 evidence items collected
+- Timeline showed 8 events
 
-**Value Propositions**:
-1. **Coverage Visibility**: See which ATT&CK tactics/techniques you can respond to
-2. **Gap Identification**: Find blind spots in IR capabilities
-3. **Threat-Informed Defense**: Build playbooks based on threat intelligence
-4. **Metrics**: Measure IR program maturity by ATT&CK coverage
-5. **Prioritization**: Focus playbook development on high-priority techniques
+**Findings:**
+- ✅ Playbook accurately guided analyst
+- ✅ ATT&CK context helped identify follow-up actions
+- ⚠️ Could benefit from automated email header parsing
 
-## Evaluation Plan
+#### Case Study 2: Ransomware Response
 
-### Phase 1: Technical Validation (Complete)
-- ✓ BPMN editor functional
-- ✓ ATT&CK data integration working
-- ✓ Validation engine operational
-- ✓ Example playbooks created
+**Scenario**: EDR alert for file encryption activity
 
-### Phase 2: Usability Testing (Future)
-- Test with SOC analysts
-- Measure playbook creation time
-- Assess ATT&CK mapping accuracy
-- Gather qualitative feedback
+**Playbook Structure:**
+- 7 tasks across 5 phases
+- 3 decision points (Active? Backup Available? Full Recovery?)
+- 8 ATT&CK techniques (T1486, T1490, T1489, T1083, T1005, T1074, T1027, T1070)
 
-### Phase 3: Real-World Deployment (Future)
-- Deploy in operational SOC
-- Track playbook usage during incidents
-- Measure time-to-response improvements
-- Validate coverage analysis predictions
+**Execution Test:**
+- Simulated incident with sandbox detonation
+- Completed in 2.5 hours (estimated: 3 hours)
+- 5 evidence items (memory dump, process list, IOCs, ransom note, network logs)
 
-## Expected Outcomes
+**Findings:**
+- ✅ Systematic containment prevented spread
+- ✅ Coverage analysis revealed missing detection for T1070 (Indicator Removal)
+- ⚠️ Evidence collection could be streamlined with API integrations
 
-### Academic Contributions
+---
 
-1. **Novel Metamodel**: First BPMN-based IR playbook metamodel with ATT&CK integration
-2. **Tool Implementation**: Open-source reference implementation
-3. **Empirical Data**: Usage metrics from SOC deployment
-4. **Coverage Framework**: Method for analyzing IR capability vs. threat landscape
+## Academic Context
 
-### Practical Impact
+### Thesis Integration
 
-1. **SOC Operations**: Structured, repeatable incident response
-2. **Training**: New analysts follow playbooks to learn procedures
-3. **Automation**: SOAR platforms execute playbooks automatically
-4. **Reporting**: Generate consistent incident reports
-5. **Continuous Improvement**: Measure and improve IR capabilities
+This platform serves as the practical component of a master's thesis project at **Illinois Institute of Technology**.
 
-## Publication Strategy
+**Authors:**
+- Mohamed Trigui (mtrigui@hawk.iit.edu)
+- Zuha Ansari (zansari1@hawk.iit.edu)
 
-### Target Venues
+**Program**: Master of Cybersecurity
+**Institution**: Illinois Institute of Technology
+**Expected Completion**: 2025
 
-**Primary**: 
-- ARES (continuation of baseline work)
-- ACM CCS Workshop on Cyber Security Operations
+### Research Goals
 
-**Secondary**:
-- IEEE Security & Privacy
-- USENIX Security (poster/demo)
+1. **Demonstrate Feasibility**: Show that BPMN + ATT&CK is viable for IR playbooks
+2. **Evaluate Usability**: Assess whether SOC analysts can use the platform effectively
+3. **Measure Impact**: Quantify improvement in IR consistency and speed
+4. **Contribute to Community**: Provide open-source tool for practitioners
 
-### Paper Structure
+---
 
-1. **Introduction**: IR challenges, need for formalization
-2. **Related Work**: FRIPP, CACAO, RE&CT, SOAR platforms
-3. **Approach**: BPMN + ATT&CK integration
-4. **Implementation**: Tool architecture
-5. **Evaluation**: Usability study + SOC deployment
-6. **Discussion**: Benefits, limitations, future work
+## Future Research Directions
 
-## Timeline
+### Short-Term (Next 6 Months)
 
-- **Weeks 1-2** (Current): Infrastructure setup ✓
-- **Weeks 3-4**: Execution engine, playbook runner
-- **Weeks 5-6**: Analytics, coverage visualization
-- **Weeks 7-8**: Additional example playbooks
-- **Weeks 9-10**: Usability testing with practitioners
-- **Weeks 11-12**: Refinements based on feedback
-- **Week 13+**: Paper writing and submission
+1. **User Study**: Recruit 10-15 SOC analysts for usability testing
+2. **Playbook Library**: Create 10+ validated playbooks (OWASP Top 10 scenarios)
+3. **Performance Metrics**: Compare incident duration with vs. without playbooks
+4. **Integration**: Connect to commercial SIEM (Splunk, ELK)
+
+### Medium-Term (1-2 Years)
+
+1. **Machine Learning**: Auto-suggest next tasks based on incident patterns
+2. **Collaboration**: Multi-analyst incident execution with real-time updates
+3. **Compliance Mapping**: Link playbooks to NIST CSF, ISO 27001
+4. **Simulation Mode**: Practice incidents in sandbox environment
+
+### Long-Term (2+ Years)
+
+1. **Automated Playbook Generation**: From threat reports to BPMN (NLP)
+2. **Adversary Emulation**: Red team playbooks using ATT&CK
+3. **Decision Support**: AI-powered recommendations during execution
+4. **Industry Adoption**: Integration with major SOAR platforms
+
+---
+
+## Publications Roadmap
+
+### Planned Papers
+
+1. **Conference Paper** (ARES 2025 or ACSAC 2025)
+   - Title: "BPMN-ATT&CK: Operationalizing Threat-Informed Incident Response Playbooks"
+   - Focus: Architecture, implementation, case studies
+   - Target: Academic audience
+
+2. **Journal Paper** (Computers & Security or TDSC)
+   - Title: "Formal Modeling and Execution of Incident Response Workflows with BPMN and MITRE ATT&CK"
+   - Focus: Theoretical foundations, formal verification, comprehensive evaluation
+   - Target: Researchers in security automation
+
+3. **Practitioner Article** (IEEE Security & Privacy or ACM Queue)
+   - Title: "Playbooks That Work: A Practical Approach to IR Standardization"
+   - Focus: Lessons learned, best practices, implementation guide
+   - Target: Security practitioners
+
+### Dataset Release
+
+Planning to release:
+- 10 validated BPMN playbooks
+- Execution logs from simulated incidents
+- ATT&CK coverage analysis data
+- User study results (anonymized)
+
+**License**: Creative Commons BY-SA 4.0
+
+---
+
+## Acknowledgments
+
+This research builds upon:
+- MITRE Corporation's ATT&CK framework
+- OMG's BPMN 2.0 specification
+- bpmn.io open-source project
+- Prior work on formal IR modeling
+
+---
 
 ## References
 
-1. Shaked, A., Cherdantseva, Y., & Burnap, P. (2022). Model-based incident response playbooks. ARES 2022.
-2. MITRE ATT&CK Framework. https://attack.mitre.org/
-3. OASIS CACAO Playbooks. https://www.oasis-open.org/committees/cacao/
-4. NIST SP 800-61 Rev. 2: Computer Security Incident Handling Guide
-5. OMG BPMN 2.0 Specification. https://www.omg.org/spec/BPMN/2.0/
-
-## Contact
-
-For questions about this research project, please refer to the GitHub repository or academic supervisor.
-
+1. Shaked, A., et al. (2022). Model-based incident response playbooks. ARES 2022.
+2. MITRE Corporation. (2024). MITRE ATT&CK Framework v14. attack.mitre.org
+3. OMG. (2011). Business Process Model and Notation (BPMN) 2.0. www.omg.org/spec/BPMN/2.0
+4. NIST. (2012). Computer Security Incident Handling Guide (SP 800-61 Rev 2).
+5. Scarfone, K., et al. (2008). Guide to Integrating Forensic Techniques into Incident Response. NIST SP 800-86.

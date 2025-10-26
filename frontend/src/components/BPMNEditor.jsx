@@ -10,6 +10,7 @@ const BPMNEditor = ({ onTaskSelect, currentPlaybook, onModelerReady }) => {
   const modelerRef = useRef(null);
   const [playbookName, setPlaybookName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [validationResults, setValidationResults] = useState(null);
   const [showValidation, setShowValidation] = useState(false);
 
@@ -80,24 +81,30 @@ const BPMNEditor = ({ onTaskSelect, currentPlaybook, onModelerReady }) => {
   // Load playbook when selected
   useEffect(() => {
     if (currentPlaybook && modelerRef.current) {
-      console.log('Loading playbook:', currentPlaybook);
-      setPlaybookName(currentPlaybook.id);
+      console.log('🔄 Loading playbook - Full data:', currentPlaybook);
+      console.log('Has bpmn_xml?', !!currentPlaybook.bpmn_xml);
+      console.log('BPMN XML length:', currentPlaybook.bpmn_xml?.length);
       
-      if (currentPlaybook.bpmn_xml) {
+      setPlaybookName(currentPlaybook.id || currentPlaybook.name || '');
+      
+      if (currentPlaybook.bpmn_xml && currentPlaybook.bpmn_xml.trim()) {
+        setIsLoading(true);
         modelerRef.current.importXML(currentPlaybook.bpmn_xml)
           .then(() => {
-            console.log('Playbook loaded successfully');
+            console.log('✓ Playbook loaded successfully');
             // Zoom to fit
             const canvas = modelerRef.current.get('canvas');
             canvas.zoom('fit-viewport');
+            setIsLoading(false);
           })
           .catch(err => {
-            console.error('Error loading playbook:', err);
-            alert(`Failed to load playbook: ${err.message}`);
+            console.error('✗ Error importing BPMN XML:', err);
+            alert(`Failed to load playbook: ${err.message || 'Invalid BPMN format'}`);
+            setIsLoading(false);
           });
       } else {
-        console.error('No BPMN XML in playbook data');
-        alert('Playbook data is missing or corrupted');
+        console.error('✗ No BPMN XML in playbook data. Keys present:', Object.keys(currentPlaybook));
+        alert('Failed to load playbook: no diagram to display\n\nThe playbook file may be empty or corrupted.');
       }
     }
   }, [currentPlaybook]);
@@ -217,7 +224,14 @@ const BPMNEditor = ({ onTaskSelect, currentPlaybook, onModelerReady }) => {
         </div>
       </div>
 
-      <div ref={containerRef} className="bpmn-canvas" />
+      <div ref={containerRef} className="bpmn-canvas">
+        {isLoading && (
+          <div className="loading-overlay">
+            <div className="loading-spinner"></div>
+            <p>Loading playbook...</p>
+          </div>
+        )}
+      </div>
 
       {showValidation && validationResults && (
         <div className="validation-panel">
