@@ -2,9 +2,8 @@
 
 > **Operationalizing Threat-Informed Incident Response through Executable BPMN Workflows**
 
-[![Demo](https://img.shields.io/badge/Demo-Video-blue)](./progress-video)
-[![Paper](https://img.shields.io/badge/Baseline-Research-green)](https://doi.org/10.1145/3538969.3544420)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Paper](https://img.shields.io/badge/Baseline%20Paper-ARES%202022-blue)](https://doi.org/10.1145/3538969.3538976)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
@@ -16,11 +15,11 @@ This platform enables security teams to design, manage, and execute incident res
 
 Traditional incident response playbooks are static documents (PDFs, Word files) that lack standardization and cannot be automated. This project transforms playbooks into **executable workflows** that:
 
-- ✅ Use **BPMN 2.0** (industry standard) instead of proprietary formats
-- ✅ Map every task to **MITRE ATT&CK techniques** for threat context
-- ✅ Provide **real-time execution tracking** with evidence collection
-- ✅ Calculate **ATT&CK coverage** and identify defensive gaps
-- ✅ Export **SOAR-compatible** workflows for automation platforms
+- Use **BPMN 2.0** (industry standard) instead of proprietary formats
+- Map every task to **MITRE ATT&CK techniques** for threat context
+- Provide **real-time execution tracking** with evidence collection
+- Calculate **ATT&CK coverage** and identify defensive gaps
+- Export **SOAR-compatible** workflows for automation platforms
 
 ## Architecture
 
@@ -71,26 +70,26 @@ graph TB
 
 ## Key Features
 
-### 🎨 Visual Playbook Designer
+### Visual Playbook Designer
 - Drag-and-drop BPMN editor with industry-standard notation
 - Task configuration (role, tool, priority, estimated time)
 - Real-time validation and compliance checking
 - Export to BPMN XML for portability
 
-### 🎯 MITRE ATT&CK Integration
+### MITRE ATT&CK Integration
 - Browse 600+ techniques across 14 tactics
 - Map multiple techniques per task
 - Automatic coverage matrix generation
 - Gap analysis for defensive planning
 
-### 📊 Incident Execution
+### Incident Execution
 - Create incidents from playbook templates
 - Track task completion in real-time
 - Collect and organize evidence
 - Generate timeline of analyst actions
 - Progress tracking with metrics
 
-### 📈 Analytics & Insights
+### Analytics & Insights
 - ATT&CK coverage visualization
 - Task duration analysis
 - Incident statistics dashboard
@@ -127,15 +126,28 @@ npm start
 
 **Access the application**: http://localhost:3000
 
+## Installation & Setup
+
+For detailed installation instructions, see the Quick Start section above. Additional setup details:
+
+**Prerequisites**: Python 3.8+ (3.11-3.12 recommended), Node.js 16+, npm 8+
+
+**Troubleshooting**:
+- If port 5000 or 3000 is in use, kill the process or change the port
+- For Python 3.13: Execution engine may be disabled due to SQLAlchemy compatibility
+- Backend health check: `http://localhost:5000/api/health`
+
+For comprehensive documentation, see the [`docs/`](./docs) directory.
+
 ## Research Context
 
 ### Baseline Paper
 This work extends the research presented in:
 
-> **Shaked, A., Cohen, R., Katz-Rogozhnikov, D. A., & Gudes, E. (2022).**  
-> *"Model-based incident response playbooks: Formal language and automated generation."*  
-> In Proceedings of the 17th International Conference on Availability, Reliability and Security (ARES 2022).  
-> 📄 [DOI: 10.1145/3538969.3544420](https://doi.org/10.1145/3538969.3544420)
+> **Shaked, A., Cherdantseva, Y., & Burnap, P. (2022).**  
+> *"Model-Based Incident Response Playbooks."*  
+> In Proceedings of the 17th International Conference on Availability, Reliability and Security (ARES 2022), August 23-26, 2022, Vienna, Austria.  
+> DOI: [10.1145/3538969.3538976](https://doi.org/10.1145/3538969.3538976) | [PDF](https://orca.cardiff.ac.uk/id/eprint/166210/1/ARES%20-%20Conference%20Paper%20-%20Model-based%20Playbooks.pdf)
 
 ### Extensions & Contributions
 
@@ -149,8 +161,8 @@ This work extends the research presented in:
 | **Coverage Analysis** | Manual | Automated ATT&CK matrix |
 
 ### Authors
-- **Mohamed Trigui** - Illinois Institute of Technology, Master's Student
-- **Zuha Ansari** - Illinois Institute of Technology, Master's Student
+**Mohamed Trigui** - Illinois Institute of Technology, Master's Student  
+**Zuha Ansari** - Illinois Institute of Technology, Master's Student
 
 ## Documentation
 
@@ -164,7 +176,7 @@ Comprehensive documentation is available in the [`docs/`](./docs) directory:
 
 ## Demo Video
 
-🎥 **[Watch the Platform Demo](./progress-video)**
+**[Watch the Platform Demo](./progress-video)**
 
 The demo showcases:
 1. Creating a phishing incident response playbook
@@ -253,6 +265,6 @@ MIT License - See [LICENSE](LICENSE) for details
 
 ---
 
-**For questions or collaboration inquiries:**
-- Mohamed Trigui - mtrigui@hawk.iit.edu
-- Zuha Ansari - zansari1@hawk.iit.edu
+**Contact:**  
+Mohamed Trigui - mtrigui@hawk.iit.edu  
+Zuha Ansari - zansari1@hawk.iit.edu

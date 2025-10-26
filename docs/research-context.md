@@ -8,24 +8,29 @@ This project builds upon academic research in formal incident response playbook 
 
 ### Primary Reference
 
-**Title**: Model-based incident response playbooks: Formal language and automated generation
+**Title**: Model-Based Incident Response Playbooks
 
-**Authors**: Shaked, A., Cohen, R., Katz-Rogozhnikov, D. A., & Gudes, E.
+**Authors**: Shaked, A., Cherdantseva, Y., & Burnap, P.
 
-**Publication**: Proceedings of the 17th International Conference on Availability, Reliability and Security (ARES 2022)
+**Institution**: School of Computer Science and Informatics, Cardiff University
 
-**DOI**: [10.1145/3538969.3544420](https://doi.org/10.1145/3538969.3544420)
+**Publication**: Proceedings of the 17th International Conference on Availability, Reliability and Security (ARES 2022), August 23-26, 2022, Vienna, Austria
+
+**DOI**: [10.1145/3538969.3538976](https://doi.org/10.1145/3538969.3538976)
+
+**PDF**: [Cardiff University Repository](https://orca.cardiff.ac.uk/id/eprint/166210/1/ARES%20-%20Conference%20Paper%20-%20Model-based%20Playbooks.pdf)
 
 **Year**: 2022
 
 ### Key Contributions of Baseline
 
-The baseline paper (FRIPP Framework) introduced:
+The baseline paper introduced FRIPP (Formalised Response to Incidents Process Playbooks), which provided:
 
-1. **Formal IR Metamodel**: Custom domain-specific language for representing incident response processes
-2. **Automated Generation**: Tool to generate playbooks from organization policies and threat intelligence
-3. **Validation**: Formal verification of playbook correctness and completeness
-4. **Standardization**: Consistent structure for IR playbooks across organizations
+1. **Formal IR Metamodel**: A rigorous, model-based design approach using Eclipse Modeling Framework
+2. **Custom Metamodel Elements**: Defined playbook processes, activities, actors, and information objects
+3. **Tool Prototype**: Eclipse-based tool for designing and visualizing IR playbooks
+4. **Process Representation**: Two-level hierarchical representation for playbook processes
+5. **Validation Capability**: Ability to check playbooks for consistency and completeness
 
 ### Limitations Addressed by Our Work
 
@@ -323,8 +328,10 @@ This research builds upon:
 
 ## References
 
-1. Shaked, A., et al. (2022). Model-based incident response playbooks. ARES 2022.
-2. MITRE Corporation. (2024). MITRE ATT&CK Framework v14. attack.mitre.org
-3. OMG. (2011). Business Process Model and Notation (BPMN) 2.0. www.omg.org/spec/BPMN/2.0
+1. Shaked, A., Cherdantseva, Y., & Burnap, P. (2022). Model-Based Incident Response Playbooks. In Proceedings of the 17th International Conference on Availability, Reliability and Security (ARES 2022), Vienna, Austria. DOI: 10.1145/3538969.3538976
+2. MITRE Corporation. (2024). MITRE ATT&CK Framework v14. https://attack.mitre.org
+3. OMG. (2011). Business Process Model and Notation (BPMN) 2.0. https://www.omg.org/spec/BPMN/2.0
 4. NIST. (2012). Computer Security Incident Handling Guide (SP 800-61 Rev 2).
 5. Scarfone, K., et al. (2008). Guide to Integrating Forensic Techniques into Incident Response. NIST SP 800-86.
+6. Onwubiko, C., & Ouazzane, K. (2020). SOTER: A Playbook for Cybersecurity Incident Management. IEEE Transactions on Engineering Management.
+7. Schlette, D., Caselli, M., & Permal, G. (2021). A Comparative Study on Cyber Threat Intelligence: The Security Incident Response Perspective. IEEE Communications Surveys & Tutorials, 23(4), 2525-2536.
