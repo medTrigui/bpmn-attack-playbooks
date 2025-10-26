@@ -79,39 +79,30 @@ const BPMNEditor = ({ onTaskSelect, currentPlaybook, onModelerReady }) => {
 
   // Load playbook when selected
   useEffect(() => {
-  if (currentPlaybook && modelerRef.current) {
-    console.log('Loading playbook:', currentPlaybook);
-    setPlaybookName(currentPlaybook.id);
-
-    const modeler = modelerRef.current;
-
-    if (currentPlaybook.bpmn_xml) {
-      modeler.importXML(currentPlaybook.bpmn_xml)
-        .then(({ warnings }) => {
-          console.log('Playbook loaded successfully', warnings);
-          
-          // Safely wait for diagram to finish rendering
-          const canvas = modeler.get('canvas');
-          if (canvas && canvas._svg) {
-            try {
-              canvas.zoom('fit-viewport');
-            } catch (zoomErr) {
-              console.warn('Zoom skipped: canvas not ready yet', zoomErr);
-            }
-          } else {
-            console.warn('Canvas not yet initialized, skipping zoom');
-          }
-        })
-        .catch(err => {
-          console.error('Error loading playbook:', err);
-          alert(`Failed to load playbook: ${err.message}`);
-        });
-    } else {
-      console.error('No BPMN XML in playbook data');
-      alert('Playbook data is missing or corrupted');
+    if (currentPlaybook && modelerRef.current) {
+      console.log('Loading playbook:', currentPlaybook);
+      setPlaybookName(currentPlaybook.id);
+      
+      if (currentPlaybook.bpmn_xml) {
+        modelerRef.current.importXML(currentPlaybook.bpmn_xml)
+    .then(() => {
+      console.log('Playbook loaded successfully');
+      const eventBus = modelerRef.current.get('eventBus');
+      eventBus.once('import.done', () => {
+        const canvas = modelerRef.current.get('canvas');
+        if (canvas) canvas.zoom('fit-viewport');
+      });
+    })
+          .catch(err => {
+            console.error('Error loading playbook:', err);
+            alert(`Failed to load playbook: ${err.message}`);
+          });
+      } else {
+        console.error('No BPMN XML in playbook data');
+        alert('Playbook data is missing or corrupted');
+      }
     }
-  }
-}, [currentPlaybook]);
+  }, [currentPlaybook]);
 
   const handleSave = async () => {
     if (!playbookName.trim()) {
