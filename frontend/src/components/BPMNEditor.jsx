@@ -81,6 +81,8 @@ const BPMNEditor = ({ onTaskSelect, currentPlaybook, onModelerReady }) => {
   useEffect(() => {
   if (currentPlaybook && modelerRef.current) {
     console.log('Loading playbook:', currentPlaybook);
+    console.log('BPMN XML length:', currentPlaybook.bpmn_xml?.length);
+    console.log('BPMN XML preview:', currentPlaybook.bpmn_xml?.slice(0, 200)); // first 200 chars
     setPlaybookName(currentPlaybook.id);
 
     const modeler = modelerRef.current;
