@@ -61,6 +61,15 @@
 | Timeline Logging | ✅ Working | Production-Ready | Automatic event tracking |
 | Progress Calculation | ✅ Working | Production-Ready | Based on completed tasks |
 
+### Evidence System
+
+| Feature | Status | Quality | Notes |
+|---------|--------|---------|-------|
+| File Upload API | Working | Production-Ready | Allows for all filetypes |
+| Evidence Storage | Working | Production-Ready | Stored in SQLite table |
+| Evidence-to-Task Linking | Working | Development-Ready | Auto-links selected task |
+| Evidence Viewer | Working | Production-Ready | Evidence allows for display |
+
 ### Frontend Components
 
 | Component | Status | Quality | Notes |
@@ -125,11 +134,11 @@ None currently identified that block core functionality.
    - **Status**: Planned for v2.0
    - **Timeline**: 3-6 months
 
-4. **Evidence File Uploads Not Implemented**
-   - **Impact**: Can only add text-based evidence
-   - **Cause**: File upload API not yet built
-   - **Workaround**: Use URLs to external file storage
-   - **Status**: Planned enhancement
+4. **Evidence-Task Dependency**
+   - **Impact**: Evidence cannot be assigned without an Incident or task
+   - **Cause**: No valid task_id
+   - **Workaround**: Create a task and add an incident before adding evidence
+   - **Status**: Planned for v2.0
    - **Timeline**: 1-2 months
 
 5. **No Real-Time Updates**
@@ -256,11 +265,9 @@ None currently identified that block core functionality.
 ### Short-Term (Next 4-6 Weeks)
 
 **4. Evidence File Upload**
-- Design file storage structure
-- [ ] Implement backend upload endpoint
-- [ ] Create frontend file picker
-- [ ] Add preview capabilities (images, PDFs)
-- [ ] Test with various file types
+- Design preview capabilities
+- [ ] Allow for evidence preview within task
+- [ ] Clean up CSS for a unique UI
 
 **5. Reporting Feature**
 - [ ] Design incident report template
