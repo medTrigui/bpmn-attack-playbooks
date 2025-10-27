@@ -162,7 +162,7 @@ This work extends the research presented in:
 
 ### Authors
 **Mohamed Trigui** - Illinois Institute of Technology, Master's Student  
-**Zuha Ansari** - Illinois Institute of Technology, Master's Student
+**Zuha Ansari** - Illinois Institute of Technology, Undergrad Student
 
 ## Documentation
 
