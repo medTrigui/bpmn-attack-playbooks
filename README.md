@@ -161,7 +161,7 @@ This work extends the research presented in:
 | **Coverage Analysis** | Manual | Automated ATT&CK matrix |
 
 ### Authors
-**Mohamed Trigui** - Illinois Institute of Technology, Master's Student  
+**Mohamed Trigui** - Illinois Institute of Technology, Co-Terminal (Bachelor's and Master's) Student  
 **Zuha Ansari** - Illinois Institute of Technology, Undergrad Student
 
 ## Documentation
