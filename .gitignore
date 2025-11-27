@@ -44,3 +44,5 @@ frontend/.eslintcache
 *.log
 logs/
 
+# Docs
+docs/

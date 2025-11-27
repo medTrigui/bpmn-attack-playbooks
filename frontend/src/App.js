@@ -7,7 +7,20 @@ import TaskPropertiesPanel from './components/TaskPropertiesPanel';
 import IncidentDashboard from './components/IncidentDashboard';
 import ExecutionView from './components/ExecutionView';
 import EvidenceViewer from './components/EvidenceViewer';
-import { checkBackendHealth } from './services/apiService';
+import AttackHeatmap from './components/AttackHeatmap';
+import { checkBackendHealth, attackAPI } from './services/apiService';
+
+const formatTacticName = (value = '') =>
+  value
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+
+const normalizeTechnique = (technique) => ({
+  ...technique,
+  tactics: (technique.tactics || []).map(formatTacticName)
+});
 
 function App() {
   const [selectedTask, setSelectedTask] = useState(null);
@@ -64,9 +77,78 @@ function App() {
   };
 
   const handleTechniquesChange = (techniques) => {
-    setSelectedTechniques(techniques);
+    const normalized = (techniques || []).map(normalizeTechnique);
+    setSelectedTechniques(normalized);
   };
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadMappedTechniques = async () => {
+      if (!selectedTask || !modelerInstance) {
+        setSelectedTechniques([]);
+        return;
+      }
+
+      const elementRegistry = modelerInstance.get('elementRegistry');
+      const element = elementRegistry.get(selectedTask.id);
+      const businessObject = element?.businessObject;
+      const attrValue = businessObject?.$attrs?.['attack:techniques'];
+
+      if (!attrValue) {
+        setSelectedTechniques([]);
+        return;
+      }
+
+      const techniqueIds = attrValue
+        .split(',')
+        .map((id) => id.trim())
+        .filter(Boolean);
+
+      if (techniqueIds.length === 0) {
+        setSelectedTechniques([]);
+        return;
+      }
+
+      try {
+        const resolved = await Promise.all(
+          techniqueIds.map(async (id) => {
+            try {
+              const data = await attackAPI.getTechnique(id);
+              return normalizeTechnique(data);
+            } catch (error) {
+              console.warn(`Failed to load technique ${id}`, error);
+              return {
+                id,
+                name: id,
+                tactics: []
+              };
+            }
+          })
+        );
+
+        if (!cancelled) {
+          setSelectedTechniques(resolved);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setSelectedTechniques(
+            techniqueIds.map((id) => ({
+              id,
+              name: id,
+              tactics: []
+            }))
+          );
+        }
+      }
+    };
+
+    loadMappedTechniques();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedTask, modelerInstance]);
   return (
     <div className="App">
       <header className="app-header">
@@ -153,6 +235,12 @@ function App() {
                 >
                   ATT&CK
                 </div>
+              <div 
+                className={`tab ${activeTab === 'coverage' ? 'active' : ''}`}
+                onClick={() => setActiveTab('coverage')}
+              >
+                Coverage
+              </div>
               </div>
               
               {activeTab === 'properties' && (
@@ -166,9 +254,17 @@ function App() {
               {activeTab === 'attack' && (
                 <ATTACKPanel 
                   selectedTask={selectedTask}
-                  onTechniquesChange={handleTechniquesChange}
+                onTechniquesChange={handleTechniquesChange}
+                currentSelection={selectedTechniques}
                 />
               )}
+
+            {activeTab === 'coverage' && (
+              <AttackHeatmap 
+                modeler={modelerInstance}
+                playbookId={currentPlaybook?.id}
+              />
+            )}
             </aside>
           </>
         )}

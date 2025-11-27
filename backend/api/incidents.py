@@ -10,76 +10,14 @@ from models.task_execution import TaskExecution
 from models.evidence import Evidence
 from models.timeline_event import TimelineEvent
 from datetime import datetime
-import xml.etree.ElementTree as ET
 from pathlib import Path
+
+from .bpmn_utils import extract_tasks_from_bpmn
 
 incidents_bp = Blueprint('incidents', __name__)
 
 # Path to playbooks
 PLAYBOOKS_DIR = Path(__file__).parent.parent.parent / 'playbook-examples'
-
-def parse_bpmn_tasks(bpmn_xml):
-    """Extract tasks from BPMN XML for execution tracking"""
-    try:
-        root = ET.fromstring(bpmn_xml)
-        tasks = []
-        
-        # Find all task elements
-        task_elements = root.findall('.//{http://www.omg.org/spec/BPMN/20100524/MODEL}task')
-        
-        for task_elem in task_elements:
-            task_data = {
-                'task_id': task_elem.get('id'),
-                'task_name': task_elem.get('name', 'Unnamed Task'),
-                'task_type': 'task'
-            }
-            
-            # Extract extension elements (IRP metadata and ATT&CK mappings)
-            ext_elements = task_elem.find('.//{http://www.omg.org/spec/BPMN/20100524/MODEL}extensionElements')
-            if ext_elements is not None:
-                # Extract IRP metadata
-                for child in ext_elements:
-                    tag_name = child.tag.split('}')[-1] if '}' in child.tag else child.tag
-                    
-                    if 'metadata' in tag_name.lower():
-                        for meta_child in child:
-                            meta_tag = meta_child.tag.split('}')[-1] if '}' in meta_child.tag else meta_child.tag
-                            meta_tag = meta_tag.replace('irp:', '')
-                            
-                            if meta_tag == 'phase':
-                                task_data['phase'] = meta_child.text
-                            elif meta_tag == 'role':
-                                task_data['role'] = meta_child.text
-                            elif meta_tag == 'tool':
-                                task_data['tool'] = meta_child.text
-                            elif meta_tag == 'priority':
-                                task_data['priority'] = meta_child.text
-                            elif meta_tag == 'estimatedTime':
-                                task_data['estimated_time'] = meta_child.text
-                    
-                    # Extract ATT&CK mappings
-                    if 'mapping' in tag_name.lower():
-                        if 'attack_techniques' not in task_data:
-                            task_data['attack_techniques'] = []
-                            task_data['attack_tactics'] = []
-                        
-                        for attack_child in child:
-                            attack_tag = attack_child.tag.split('}')[-1] if '}' in attack_child.tag else attack_child.tag
-                            
-                            if 'technique' in attack_tag.lower():
-                                tech_id = attack_child.get('id')
-                                if tech_id:
-                                    task_data['attack_techniques'].append(tech_id)
-                            elif 'tactic' in attack_tag.lower():
-                                if attack_child.text:
-                                    task_data['attack_tactics'].append(attack_child.text)
-            
-            tasks.append(task_data)
-        
-        return tasks
-    except Exception as e:
-        print(f"Error parsing BPMN: {e}")
-        return []
 
 @incidents_bp.route('/', methods=['GET'])
 def list_incidents():
@@ -141,7 +79,7 @@ def create_incident():
             bpmn_xml = f.read()
         
         # Parse tasks from BPMN
-        tasks = parse_bpmn_tasks(bpmn_xml)
+        tasks = extract_tasks_from_bpmn(bpmn_xml)
         
         # Create incident
         incident = Incident(

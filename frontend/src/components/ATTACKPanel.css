@@ -6,6 +6,32 @@
 
 .attack-header {
   margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.clear-techniques-btn {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #6b7280;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-techniques-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clear-techniques-btn:not(:disabled):hover {
+  color: #dc2626;
+  border-color: #dc2626;
 }
 
 .attack-header h3 {

@@ -1,0 +1,197 @@
+.attack-heatmap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: #f8f9fb;
+  border-radius: 12px;
+  border: 1px solid #e6e8ec;
+  min-height: 200px;
+}
+
+.attack-heatmap h3 {
+  margin: 0;
+  color: #1f2d3d;
+}
+
+.heatmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.heatmap-header p {
+  margin: 4px 0 0 0;
+  color: #6c7a89;
+  font-size: 14px;
+}
+
+.heatmap-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.heatmap-actions .timestamp {
+  font-size: 12px;
+  color: #95a5a6;
+}
+
+.heatmap-empty,
+.heatmap-error {
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.heatmap-empty {
+  background: #fff;
+  color: #7f8c8d;
+  border: 1px dashed #dcdfe6;
+}
+
+.heatmap-error {
+  background: #fef0f0;
+  color: #c0392b;
+  border: 1px solid #f5b7b1;
+}
+
+.heatmap-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.summary-card {
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #edf0f5;
+  text-align: center;
+}
+
+.summary-label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #95a5a6;
+  letter-spacing: 0.05em;
+}
+
+.summary-value {
+  display: block;
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.heatmap-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #edf0f5;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 140px;
+  transition: transform 0.2s ease;
+}
+
+.heatmap-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(31, 45, 61, 0.08);
+}
+
+.tactic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.tactic-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.tactic-id {
+  font-size: 12px;
+  color: #95a5a6;
+}
+
+.tactic-metrics {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.metric-value {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.metric-subtitle {
+  font-size: 13px;
+  color: #7f8c8d;
+}
+
+.tactic-techniques {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.technique-chip {
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #f0f6ff;
+  border: 1px solid #d6e4ff;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+}
+
+.heat-none {
+  border-left: 4px solid #dfe6e9;
+}
+
+.heat-low {
+  border-left: 4px solid #74b9ff;
+  background: #f1f8ff;
+}
+
+.heat-medium {
+  border-left: 4px solid #fdcb6e;
+  background: #fff8ec;
+}
+
+.heat-high {
+  border-left: 4px solid #55efc4;
+  background: #f0fffa;
+}
+
+.btn.btn-outline {
+  border: 1px solid #dcdfe6;
+  background: #fff;
+  color: #34495e;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn.btn-outline:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+

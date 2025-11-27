@@ -11,6 +11,7 @@ const ExecutionView = ({ incident, onBack }) => {
   const [activeTab, setActiveTab] = useState('tasks'); // tasks, timeline, evidence
   const [loading, setLoading] = useState(false);
   const [showEvidenceModal, setShowEvidenceModal] = useState(false);
+  const [timelineFilter, setTimelineFilter] = useState('all');
   const [newEvidence, setNewEvidence] = useState({
     title: '',
     description: '',
@@ -38,7 +39,12 @@ const ExecutionView = ({ incident, onBack }) => {
       const data = await incidentsAPI.get(incident.id);
       setIncidentData(data.incident);
       setTasks(data.tasks || []);
-      setTimeline(data.timeline || []);
+      const orderedTimeline = (data.timeline || []).slice().sort((a, b) => {
+        const left = new Date(a.timestamp).getTime();
+        const right = new Date(b.timestamp).getTime();
+        return left - right;
+      });
+      setTimeline(orderedTimeline);
       setEvidence(data.evidence || []);
     } catch (error) {
       console.error('Error loading incident data:', error);
@@ -168,6 +174,36 @@ const ExecutionView = ({ incident, onBack }) => {
     return phases;
   };
 
+  const parseEstimatedMinutes = (value) => {
+    if (!value) return null;
+    const lower = value.toLowerCase();
+    let minutes = 0;
+
+    const hourMatch = lower.match(/(\d+(?:\.\d+)?)\s*(hour|hr)/);
+    if (hourMatch) {
+      minutes += parseFloat(hourMatch[1]) * 60;
+    }
+
+    const minuteMatch = lower.match(/(\d+(?:\.\d+)?)\s*(minute|min)/);
+    if (minuteMatch) {
+      minutes += parseFloat(minuteMatch[1]);
+    }
+
+    if (minutes === 0) {
+      const fallback = lower.match(/(\d+(?:\.\d+)?)/);
+      if (fallback) {
+        minutes = parseFloat(fallback[1]);
+      }
+    }
+
+    return Number.isNaN(minutes) ? null : Math.round(minutes);
+  };
+
+  const formatMinutesValue = (value) => {
+    if (value === null || value === undefined) return '—';
+    return `${value}m`;
+  };
+
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return 'N/A';
     return new Date(timestamp).toLocaleString();
@@ -182,6 +218,58 @@ const ExecutionView = ({ incident, onBack }) => {
   }
 
   const tasksByPhase = getTasksByPhase();
+  const comparisonRows = tasks.map(task => {
+    const estimatedMinutes = parseEstimatedMinutes(task.estimated_time);
+    const actualMinutes = typeof task.actual_duration_minutes === 'number'
+      ? task.actual_duration_minutes
+      : null;
+    const delta = estimatedMinutes !== null && actualMinutes !== null
+      ? actualMinutes - estimatedMinutes
+      : null;
+    let statusLabel = 'Not Measured';
+
+    if (delta !== null) {
+      if (Math.abs(delta) <= 5) {
+        statusLabel = 'On Track';
+      } else if (delta > 0) {
+        statusLabel = `Behind by ${delta}m`;
+      } else {
+        statusLabel = `Ahead by ${Math.abs(delta)}m`;
+      }
+    }
+
+    return {
+      id: task.id,
+      name: task.task_name,
+      estimatedMinutes,
+      actualMinutes,
+      delta,
+      statusLabel,
+      startedAt: task.started_at,
+      completedAt: task.completed_at
+    };
+  });
+
+  const analysisStats = {
+    behind: comparisonRows.filter(row => row.delta !== null && row.delta > 5).length,
+    ahead: comparisonRows.filter(row => row.delta !== null && row.delta < -5).length,
+    onTrack: comparisonRows.filter(row => row.delta !== null && Math.abs(row.delta) <= 5).length,
+    measured: comparisonRows.filter(row => row.delta !== null).length
+  };
+
+  const filteredTimeline = timeline.filter(event => {
+    if (timelineFilter === 'tasks') {
+      return event.event_type && event.event_type.startsWith('task');
+    }
+    if (timelineFilter === 'evidence') {
+      return event.event_type === 'evidence_added';
+    }
+    return true;
+  });
+
+  const evidenceTimeline = evidence
+    .slice()
+    .sort((a, b) => new Date(a.collected_at) - new Date(b.collected_at));
 
   return (
     <div className="execution-view">
@@ -263,6 +351,12 @@ const ExecutionView = ({ incident, onBack }) => {
           onClick={() => setActiveTab('evidence')}
         >
           Evidence ({evidence.length})
+        </button>
+        <button
+          className={`tab ${activeTab === 'analysis' ? 'active' : ''}`}
+          onClick={() => setActiveTab('analysis')}
+        >
+          Analysis
         </button>
       </div>
 
@@ -440,11 +534,31 @@ const ExecutionView = ({ incident, onBack }) => {
         {/* Timeline Tab */}
         {activeTab === 'timeline' && (
           <div className="timeline-panel">
-            {timeline.length === 0 ? (
+            <div className="timeline-filters">
+              <button
+                className={`filter-chip ${timelineFilter === 'all' ? 'active' : ''}`}
+                onClick={() => setTimelineFilter('all')}
+              >
+                All
+              </button>
+              <button
+                className={`filter-chip ${timelineFilter === 'tasks' ? 'active' : ''}`}
+                onClick={() => setTimelineFilter('tasks')}
+              >
+                Tasks
+              </button>
+              <button
+                className={`filter-chip ${timelineFilter === 'evidence' ? 'active' : ''}`}
+                onClick={() => setTimelineFilter('evidence')}
+              >
+                Evidence
+              </button>
+            </div>
+            {filteredTimeline.length === 0 ? (
               <div className="empty-state">No timeline events yet</div>
             ) : (
-                <div className="timeline-list">
-                {timeline.map(event => (
+              <div className="timeline-list">
+                {filteredTimeline.map(event => (
                   <div key={event.id} className="timeline-event">
                     <div className="timeline-icon">•</div>
                     <div className="timeline-content">
@@ -509,6 +623,89 @@ const ExecutionView = ({ incident, onBack }) => {
                 ))}
               </div>
             )}
+            <div className="evidence-timeline-section">
+              <h4>Evidence Timeline</h4>
+              {evidenceTimeline.length === 0 ? (
+                <div className="empty-state">No evidence collected yet</div>
+              ) : (
+                <div className="evidence-timeline">
+                  {evidenceTimeline.map(item => (
+                    <div key={item.id} className="evidence-timeline-event">
+                      <div className="timeline-dot"></div>
+                      <div className="timeline-body">
+                        <div className="timeline-row">
+                          <strong>{item.title}</strong>
+                          <span>{formatTimestamp(item.collected_at)}</span>
+                        </div>
+                        <div className="timeline-meta">
+                          <span>{item.evidence_type}</span>
+                          {item.collected_by && <span>• {item.collected_by}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'analysis' && (
+          <div className="analysis-panel">
+            <div className="analysis-summary">
+              <div className="summary-card">
+                <span className="summary-label">Measured Tasks</span>
+                <span className="summary-value">
+                  {analysisStats.measured}/{comparisonRows.length}
+                </span>
+              </div>
+              <div className="summary-card">
+                <span className="summary-label">On Track</span>
+                <span className="summary-value">{analysisStats.onTrack}</span>
+              </div>
+              <div className="summary-card">
+                <span className="summary-label">Ahead</span>
+                <span className="summary-value">{analysisStats.ahead}</span>
+              </div>
+              <div className="summary-card">
+                <span className="summary-label">Behind</span>
+                <span className="summary-value">{analysisStats.behind}</span>
+              </div>
+            </div>
+            <div className="analysis-table-wrapper">
+              {comparisonRows.length === 0 ? (
+                <div className="empty-state">No tasks available for analysis</div>
+              ) : (
+                <table className="analysis-table">
+                  <thead>
+                    <tr>
+                      <th>Task</th>
+                      <th>Estimated</th>
+                      <th>Actual</th>
+                      <th>Delta</th>
+                      <th>Status</th>
+                      <th>Started</th>
+                      <th>Completed</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {comparisonRows.map(row => (
+                      <tr key={row.id}>
+                        <td>{row.name}</td>
+                        <td>{formatMinutesValue(row.estimatedMinutes)}</td>
+                        <td>{formatMinutesValue(row.actualMinutes)}</td>
+                        <td>
+                          {row.delta === null ? '—' : `${row.delta > 0 ? '+' : ''}${row.delta}m`}
+                        </td>
+                        <td>{row.statusLabel}</td>
+                        <td>{formatTimestamp(row.startedAt)}</td>
+                        <td>{formatTimestamp(row.completedAt)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
         )}
       </div>

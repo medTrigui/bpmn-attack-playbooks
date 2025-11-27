@@ -10,6 +10,8 @@ from pathlib import Path
 from datetime import datetime
 import xml.etree.ElementTree as ET
 
+from .bpmn_utils import BPMN_NS, extract_tasks_from_bpmn
+
 playbooks_bp = Blueprint('playbooks', __name__)
 
 # Path to playbooks storage
@@ -20,30 +22,31 @@ def get_playbook_metadata(bpmn_xml):
     """Extract metadata from BPMN XML"""
     try:
         root = ET.fromstring(bpmn_xml)
+        tasks = extract_tasks_from_bpmn(bpmn_xml)
         
         # Count elements
-        tasks = root.findall('.//{http://www.omg.org/spec/BPMN/20100524/MODEL}task')
-        events = root.findall('.//{http://www.omg.org/spec/BPMN/20100524/MODEL}startEvent') + \
-                root.findall('.//{http://www.omg.org/spec/BPMN/20100524/MODEL}endEvent')
-        gateways = root.findall('.//{http://www.omg.org/spec/BPMN/20100524/MODEL}*Gateway')
+        events = root.findall(f'.//{{{BPMN_NS}}}startEvent') + root.findall(f'.//{{{BPMN_NS}}}endEvent')
+        gateway_tags = [
+            'exclusiveGateway',
+            'parallelGateway',
+            'inclusiveGateway',
+            'complexGateway',
+            'eventBasedGateway'
+        ]
+        gateway_count = sum(len(root.findall(f'.//{{{BPMN_NS}}}{tag}')) for tag in gateway_tags)
         
-        # Extract ATT&CK mappings from extension elements
-        attack_techniques = []
-        for task in tasks:
-            for ext in task.findall('.//{http://www.omg.org/spec/BPMN/20100524/MODEL}extensionElements'):
-                # Look for our custom attack:technique elements
-                for child in ext:
-                    if 'technique' in child.tag.lower():
-                        tech_id = child.get('id', '')
-                        if tech_id:
-                            attack_techniques.append(tech_id)
+        attack_techniques = sorted({
+            tech
+            for task in tasks
+            for tech in task.get('attack_techniques', [])
+        })
         
         return {
             'task_count': len(tasks),
             'event_count': len(events),
-            'gateway_count': len(gateways),
-            'attack_techniques': list(set(attack_techniques)),
-            'technique_count': len(set(attack_techniques))
+            'gateway_count': gateway_count,
+            'attack_techniques': attack_techniques,
+            'technique_count': len(attack_techniques)
         }
     except Exception as e:
         return {

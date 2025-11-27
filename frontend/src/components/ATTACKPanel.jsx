@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import './ATTACKPanel.css';
 import { attackAPI } from '../services/apiService';
 
-const ATTACKPanel = ({ selectedTask, onTechniquesChange }) => {
+const ATTACKPanel = ({ selectedTask, onTechniquesChange, currentSelection = [] }) => {
   const [tactics, setTactics] = useState([]);
   const [techniques, setTechniques] = useState([]);
   const [selectedTactic, setSelectedTactic] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedTechniques, setSelectedTechniques] = useState([]);
+  const [isSyncingFromParent, setIsSyncingFromParent] = useState(false);
 
   useEffect(() => {
     // Load tactics on mount
@@ -24,10 +25,19 @@ const ATTACKPanel = ({ selectedTask, onTechniquesChange }) => {
 
   // Notify parent when selected techniques change
   useEffect(() => {
+    if (isSyncingFromParent) {
+      setIsSyncingFromParent(false);
+      return;
+    }
     if (onTechniquesChange) {
       onTechniquesChange(selectedTechniques);
     }
-  }, [selectedTechniques, onTechniquesChange]);
+  }, [selectedTechniques, onTechniquesChange, isSyncingFromParent]);
+
+  useEffect(() => {
+    setIsSyncingFromParent(true);
+    setSelectedTechniques(currentSelection || []);
+  }, [currentSelection]);
 
   const loadTactics = async () => {
     setLoading(true);
@@ -85,12 +95,21 @@ const ATTACKPanel = ({ selectedTask, onTechniquesChange }) => {
   return (
     <div className="attack-panel">
       <div className="attack-header">
-        <h3>MITRE ATT&CK</h3>
-        {selectedTask && (
-          <span className="selected-task-indicator">
-            Task: {selectedTask.name}
-          </span>
-        )}
+        <div>
+          <h3>MITRE ATT&CK</h3>
+          {selectedTask && (
+            <span className="selected-task-indicator">
+              Task: {selectedTask.name}
+            </span>
+          )}
+        </div>
+        <button 
+          className="clear-techniques-btn"
+          onClick={() => setSelectedTechniques([])}
+          disabled={selectedTechniques.length === 0}
+        >
+          Clear
+        </button>
       </div>
 
       {/* Search */}
@@ -149,7 +168,7 @@ const ATTACKPanel = ({ selectedTask, onTechniquesChange }) => {
                     <span className="technique-name">{technique.name}</span>
                   </div>
                   <div className="technique-description">
-                    {technique.description.substring(0, 150)}...
+                    {(technique.description || 'No description available.').substring(0, 150)}...
                   </div>
                   {technique.platforms && technique.platforms.length > 0 && (
                     <div className="technique-platforms">

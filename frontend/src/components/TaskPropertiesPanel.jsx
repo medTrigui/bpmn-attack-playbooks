@@ -13,6 +13,23 @@ const TaskPropertiesPanel = ({ task, modeler, selectedTechniques }) => {
     notes: ''
   });
   const [hasChanges, setHasChanges] = useState(false);
+  const [techniqueSnapshot, setTechniqueSnapshot] = useState([]);
+
+  const extractTechniqueIds = (element) => {
+    const attr = element?.businessObject?.$attrs?.['attack:techniques'];
+    if (!attr) return [];
+    return attr
+      .split(',')
+      .map((id) => id.trim())
+      .filter(Boolean);
+  };
+
+  const arraysEqual = (a = [], b = []) => {
+    if (a.length !== b.length) return false;
+    const left = [...a].sort();
+    const right = [...b].sort();
+    return left.every((value, index) => value === right[index]);
+  };
 
   // Load task properties when task changes
   useEffect(() => {
@@ -34,6 +51,7 @@ const TaskPropertiesPanel = ({ task, modeler, selectedTechniques }) => {
           notes: businessObject.$attrs['irp:notes'] || ''
         });
         setHasChanges(false);
+        setTechniqueSnapshot(extractTechniqueIds(element));
       }
     }
   }, [task, modeler]);
@@ -68,18 +86,18 @@ const TaskPropertiesPanel = ({ task, modeler, selectedTechniques }) => {
         'irp:notes': properties.notes
       });
 
-      // Update ATT&CK techniques if selected
-      if (selectedTechniques && selectedTechniques.length > 0) {
-        const techniqueIds = selectedTechniques.map(t => t.id).join(',');
-        const tacticNames = [...new Set(selectedTechniques.flatMap(t => t.tactics.map(tactic => tactic.name)))].join(',');
-        
-        modeling.updateProperties(element, {
-          'attack:techniques': techniqueIds,
-          'attack:tactics': tacticNames
-        });
-      }
+      const techniqueIds = (selectedTechniques || []).map(t => t.id).filter(Boolean);
+      const tacticNames = [...new Set(
+        (selectedTechniques || []).flatMap(t => t.tactics || [])
+      )];
+
+      modeling.updateProperties(element, {
+        'attack:techniques': techniqueIds.length ? techniqueIds.join(',') : undefined,
+        'attack:tactics': tacticNames.length ? tacticNames.join(',') : undefined
+      });
 
       setHasChanges(false);
+      setTechniqueSnapshot(techniqueIds);
       alert('Task properties updated successfully!');
     }
   };
@@ -104,9 +122,14 @@ const TaskPropertiesPanel = ({ task, modeler, selectedTechniques }) => {
           notes: businessObject.$attrs['irp:notes'] || ''
         });
         setHasChanges(false);
+        setTechniqueSnapshot(extractTechniqueIds(element));
       }
     }
   };
+
+  const selectedTechniqueIds = (selectedTechniques || []).map((tech) => tech.id);
+  const techniquesChanged = !arraysEqual(techniqueSnapshot, selectedTechniqueIds);
+  const canApply = hasChanges || techniquesChanged;
 
   if (!task) {
     return (
@@ -251,9 +274,9 @@ const TaskPropertiesPanel = ({ task, modeler, selectedTechniques }) => {
         <button 
           className="btn btn-primary" 
           onClick={handleApply}
-          disabled={!hasChanges}
+          disabled={!canApply}
         >
-          {hasChanges ? 'Apply Changes' : 'No Changes'}
+          {canApply ? 'Apply Changes' : 'No Changes'}
         </button>
       </div>
     </div>

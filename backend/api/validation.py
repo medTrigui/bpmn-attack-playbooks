@@ -6,6 +6,8 @@ Validates BPMN playbooks for completeness and correctness
 from flask import Blueprint, jsonify, request
 import xml.etree.ElementTree as ET
 
+from .bpmn_utils import BPMN_NS, extract_tasks_from_bpmn
+
 validation_bp = Blueprint('validation', __name__)
 
 def validate_bpmn_structure(xml_string):
@@ -23,8 +25,8 @@ def validate_bpmn_structure(xml_string):
         }
     
     # Check for start and end events
-    start_events = root.findall('.//{http://www.omg.org/spec/BPMN/20100524/MODEL}startEvent')
-    end_events = root.findall('.//{http://www.omg.org/spec/BPMN/20100524/MODEL}endEvent')
+    start_events = root.findall(f'.//{{{BPMN_NS}}}startEvent')
+    end_events = root.findall(f'.//{{{BPMN_NS}}}endEvent')
     
     if not start_events:
         errors.append('No start event found')
@@ -32,7 +34,7 @@ def validate_bpmn_structure(xml_string):
         errors.append('No end event found')
     
     # Check tasks
-    tasks = root.findall('.//{http://www.omg.org/spec/BPMN/20100524/MODEL}task')
+    tasks = root.findall(f'.//{{{BPMN_NS}}}task')
     
     if len(tasks) == 0:
         warnings.append('No tasks defined in playbook')
@@ -46,8 +48,8 @@ def validate_bpmn_structure(xml_string):
     all_elements = tasks + start_events + end_events
     for element in all_elements:
         element_id = element.get('id')
-        has_incoming = element.find('{http://www.omg.org/spec/BPMN/20100524/MODEL}incoming') is not None
-        has_outgoing = element.find('{http://www.omg.org/spec/BPMN/20100524/MODEL}outgoing') is not None
+        has_incoming = element.find(f'{{{BPMN_NS}}}incoming') is not None
+        has_outgoing = element.find(f'{{{BPMN_NS}}}outgoing') is not None
         
         # Start events should have outgoing
         if 'startEvent' in element.tag and not has_outgoing:
@@ -75,29 +77,12 @@ def validate_attack_mappings(xml_string):
     errors = []
     warnings = []
     
-    try:
-        root = ET.fromstring(xml_string)
-    except:
-        return {'errors': [], 'warnings': []}
-    
-    tasks = root.findall('.//{http://www.omg.org/spec/BPMN/20100524/MODEL}task')
-    
+    tasks = extract_tasks_from_bpmn(xml_string)
     tasks_without_attack = []
     for task in tasks:
-        task_id = task.get('id')
-        task_name = task.get('name', 'unnamed')
-        
-        # Check for ATT&CK mapping in extension elements
-        has_attack_mapping = False
-        ext_elements = task.find('{http://www.omg.org/spec/BPMN/20100524/MODEL}extensionElements')
-        
-        if ext_elements is not None:
-            for child in ext_elements:
-                if 'attack' in child.tag.lower() or 'technique' in child.tag.lower():
-                    has_attack_mapping = True
-                    break
-        
-        if not has_attack_mapping:
+        if not task.get('attack_techniques'):
+            task_id = task.get('task_id')
+            task_name = task.get('task_name', 'unnamed')
             tasks_without_attack.append(f'{task_id} ({task_name})')
     
     if tasks_without_attack:
@@ -112,34 +97,18 @@ def validate_ir_metadata(xml_string):
     """Validate IR-specific metadata (roles, tools, evidence)"""
     warnings = []
     
-    try:
-        root = ET.fromstring(xml_string)
-    except:
-        return {'warnings': []}
-    
-    tasks = root.findall('.//{http://www.omg.org/spec/BPMN/20100524/MODEL}task')
+    tasks = extract_tasks_from_bpmn(xml_string)
     
     tasks_without_role = []
     tasks_without_tool = []
     
     for task in tasks:
-        task_id = task.get('id')
-        task_name = task.get('name', 'unnamed')
+        task_id = task.get('task_id')
+        task_name = task.get('task_name', 'unnamed')
         
-        has_role = False
-        has_tool = False
-        
-        ext_elements = task.find('{http://www.omg.org/spec/BPMN/20100524/MODEL}extensionElements')
-        if ext_elements is not None:
-            for child in ext_elements:
-                if 'role' in child.tag.lower():
-                    has_role = True
-                if 'tool' in child.tag.lower():
-                    has_tool = True
-        
-        if not has_role:
+        if not task.get('role'):
             tasks_without_role.append(f'{task_id} ({task_name})')
-        if not has_tool:
+        if not task.get('tool'):
             tasks_without_tool.append(f'{task_id} ({task_name})')
     
     if tasks_without_role:
