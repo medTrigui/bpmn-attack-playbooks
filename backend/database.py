@@ -37,7 +37,7 @@ def init_db(app):
         
         # Create all tables
         db.create_all()
-        print("✓ Database initialized successfully")
+        print("Database initialized successfully")
     
     return db
 

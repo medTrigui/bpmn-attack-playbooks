@@ -23,7 +23,7 @@ try:
     from database import init_db
     DB_AVAILABLE = True
 except (ImportError, AssertionError) as e:
-    print(f"\n⚠️  Database module failed to load: {type(e).__name__}")
+    print(f"\nWARNING: Database module failed to load: {type(e).__name__}")
     print("   This is likely due to SQLAlchemy incompatibility with Python 3.13")
     print("   The server will start WITHOUT incident tracking functionality")
     print("   To fix: Use Python 3.11 or 3.12\n")
@@ -76,13 +76,13 @@ def health():
 
 if __name__ == '__main__':
     print("\n" + "="*60)
-    print("🚀 BPMN Attack Playbooks Backend Starting")
+    print("BPMN Attack Playbooks Backend Starting")
     print("="*60)
     if DB_AVAILABLE:
-        print("✓ Execution Engine: ENABLED")
+        print("Execution Engine: ENABLED")
         print("  You can create and manage incidents")
     else:
-        print("⚠️  Execution Engine: DISABLED")
+        print("WARNING: Execution Engine: DISABLED")
         print("  Playbook editor and ATT&CK features work normally")
         print("  To enable incident tracking: Use Python 3.11 or 3.12")
     print("="*60 + "\n")

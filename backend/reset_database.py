@@ -13,12 +13,12 @@ def reset_database():
     if db_path.exists():
         print(f"🗑️  Deleting existing database: {db_path}")
         os.remove(db_path)
-        print("✓ Database deleted")
+        print("Database deleted")
     else:
         print("ℹ️  No existing database found")
     
-    print("\n✓ Database will be recreated when you run main.py")
-    print("⚠️  Note: All existing incidents will be lost\n")
+    print("\nDatabase will be recreated when you run main.py")
+    print("WARNING: All existing incidents will be lost\n")
 
 if __name__ == "__main__":
     import sys

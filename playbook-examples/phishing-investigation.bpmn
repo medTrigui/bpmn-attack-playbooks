@@ -141,5 +141,62 @@
     <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_NotifyUsers" targetRef="EndEvent_1"/>
     
   </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_PhishingInvestigation">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="100" y="150" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AnalyzeEmail_di" bpmnElement="Task_AnalyzeEmail">
+        <dc:Bounds x="200" y="130" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ExtractIOCs_di" bpmnElement="Task_ExtractIOCs">
+        <dc:Bounds x="360" y="130" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SearchSimilar_di" bpmnElement="Task_SearchSimilar">
+        <dc:Bounds x="520" y="130" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_QuarantineEmails_di" bpmnElement="Task_QuarantineEmails">
+        <dc:Bounds x="680" y="130" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_BlockIOCs_di" bpmnElement="Task_BlockIOCs">
+        <dc:Bounds x="840" y="130" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_NotifyUsers_di" bpmnElement="Task_NotifyUsers">
+        <dc:Bounds x="1000" y="130" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="1180" y="150" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="136" y="168"/>
+        <di:waypoint x="200" y="168"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="320" y="168"/>
+        <di:waypoint x="360" y="168"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="480" y="168"/>
+        <di:waypoint x="520" y="168"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="640" y="168"/>
+        <di:waypoint x="680" y="168"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="800" y="168"/>
+        <di:waypoint x="840" y="168"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="960" y="168"/>
+        <di:waypoint x="1000" y="168"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7">
+        <di:waypoint x="1120" y="168"/>
+        <di:waypoint x="1180" y="168"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
 </bpmn:definitions>
 

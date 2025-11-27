@@ -8,11 +8,21 @@ import { playbooksAPI, validationAPI } from '../services/apiService';
 const BPMNEditor = ({ onTaskSelect, currentPlaybook, onModelerReady }) => {
   const containerRef = useRef(null);
   const modelerRef = useRef(null);
+  const taskSelectRef = useRef(onTaskSelect);
+  const modelerReadyRef = useRef(onModelerReady);
   const [playbookName, setPlaybookName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [validationResults, setValidationResults] = useState(null);
   const [showValidation, setShowValidation] = useState(false);
+
+  useEffect(() => {
+    taskSelectRef.current = onTaskSelect;
+  }, [onTaskSelect]);
+
+  useEffect(() => {
+    modelerReadyRef.current = onModelerReady;
+  }, [onModelerReady]);
 
   // Initialize BPMN Modeler
   useEffect(() => {
@@ -54,8 +64,8 @@ const BPMNEditor = ({ onTaskSelect, currentPlaybook, onModelerReady }) => {
     });
 
     // Notify parent that modeler is ready
-    if (onModelerReady) {
-      onModelerReady(modeler);
+    if (modelerReadyRef.current) {
+      modelerReadyRef.current(modeler);
     }
 
     // Handle element selection
@@ -64,11 +74,14 @@ const BPMNEditor = ({ onTaskSelect, currentPlaybook, onModelerReady }) => {
       const element = e.element;
       if (element.type === 'bpmn:Task' || element.type === 'bpmn:UserTask' || 
           element.type === 'bpmn:ManualTask' || element.type === 'bpmn:ServiceTask') {
-        onTaskSelect({
-          id: element.id,
-          name: element.businessObject.name || 'Unnamed Task',
-          type: element.type
-        });
+        const handler = taskSelectRef.current;
+        if (handler) {
+          handler({
+            id: element.id,
+            name: element.businessObject.name || 'Unnamed Task',
+            type: element.type
+          });
+        }
       }
     });
 
@@ -76,7 +89,7 @@ const BPMNEditor = ({ onTaskSelect, currentPlaybook, onModelerReady }) => {
     return () => {
       modeler.destroy();
     };
-  }, [onTaskSelect, onModelerReady]);
+  }, []);
 
   // Load playbook when selected
   useEffect(() => {
