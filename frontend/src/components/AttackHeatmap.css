@@ -7,6 +7,8 @@
   border-radius: 12px;
   border: 1px solid #e6e8ec;
   min-height: 200px;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .attack-heatmap h3 {
@@ -148,6 +150,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  margin-top: 6px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.tactic-techniques.expanded {
+  max-height: 200px;
 }
 
 .technique-chip {
@@ -158,6 +168,12 @@
   color: #1d4ed8;
   font-size: 12px;
   font-family: 'Courier New', monospace;
+}
+
+.technique-chip.active-tech {
+  background: #dbeafe;
+  border-color: #1d4ed8;
+  font-weight: 600;
 }
 
 .heat-none {
@@ -193,5 +209,6 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
 
 

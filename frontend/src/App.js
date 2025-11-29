@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import BPMNEditor from './components/BPMNEditor';
 import ATTACKPanel from './components/ATTACKPanel';
@@ -32,6 +32,9 @@ function App() {
   const [modelerInstance, setModelerInstance] = useState(null);
   const [selectedTechniques, setSelectedTechniques] = useState([]);
   const [activeTab, setActiveTab] = useState('properties'); // properties, attack
+  const [sidePanelWidth, setSidePanelWidth] = useState(360);
+  const [isPanelResizing, setIsPanelResizing] = useState(false);
+  const panelDragRef = useRef({ startX: 0, startWidth: 360 });
 
   useEffect(() => {
     // Check backend connection on mount
@@ -149,6 +152,31 @@ function App() {
       cancelled = true;
     };
   }, [selectedTask, modelerInstance]);
+
+  useEffect(() => {
+    const handleMouseMove = (event) => {
+      if (!isPanelResizing) return;
+      const delta = panelDragRef.current.startX - event.clientX;
+      const nextWidth = Math.min(
+        Math.max(panelDragRef.current.startWidth + delta, 260),
+        700
+      );
+      setSidePanelWidth(nextWidth);
+    };
+
+    const handleMouseUp = () => {
+      if (isPanelResizing) {
+        setIsPanelResizing(false);
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isPanelResizing]);
   return (
     <div className="App">
       <header className="app-header">
@@ -221,7 +249,20 @@ function App() {
               />
             </main>
 
-            <aside className="side-panel">
+            <div
+              className={`side-panel-resize-handle ${isPanelResizing ? 'active' : ''}`}
+              onMouseDown={(e) => {
+                panelDragRef.current = {
+                    startX: e.clientX,
+                    startWidth: sidePanelWidth
+                };
+                setIsPanelResizing(true);
+              }}
+            />
+            <aside
+              className={`side-panel ${isPanelResizing ? 'resizing' : ''}`}
+              style={{ width: `${sidePanelWidth}px` }}
+            >
               <div className="panel-tabs">
                 <div 
                   className={`tab ${activeTab === 'properties' ? 'active' : ''}`}
@@ -242,29 +283,31 @@ function App() {
                 Coverage
               </div>
               </div>
-              
-              {activeTab === 'properties' && (
-                <TaskPropertiesPanel 
-                  task={selectedTask} 
-                  modeler={modelerInstance}
-                  selectedTechniques={selectedTechniques}
-                />
-              )}
-              
-              {activeTab === 'attack' && (
-                <ATTACKPanel 
-                  selectedTask={selectedTask}
-                onTechniquesChange={handleTechniquesChange}
-                currentSelection={selectedTechniques}
-                />
-              )}
 
-            {activeTab === 'coverage' && (
-              <AttackHeatmap 
-                modeler={modelerInstance}
-                playbookId={currentPlaybook?.id}
-              />
-            )}
+              <div className="panel-content">
+                {activeTab === 'properties' && (
+                  <TaskPropertiesPanel 
+                    task={selectedTask} 
+                    modeler={modelerInstance}
+                    selectedTechniques={selectedTechniques}
+                  />
+                )}
+                
+                {activeTab === 'attack' && (
+                  <ATTACKPanel 
+                    selectedTask={selectedTask}
+                    onTechniquesChange={handleTechniquesChange}
+                    currentSelection={selectedTechniques}
+                  />
+                )}
+
+                {activeTab === 'coverage' && (
+                  <AttackHeatmap 
+                    modeler={modelerInstance}
+                    playbookId={currentPlaybook?.id}
+                  />
+                )}
+              </div>
             </aside>
           </>
         )}

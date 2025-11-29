@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './PlaybookLibrary.css';
 import { playbooksAPI } from '../services/apiService';
+import { normalizeBpmnExtensions } from '../utils/bpmn';
 
 const PlaybookLibrary = ({ onPlaybookLoad }) => {
   const [playbooks, setPlaybooks] = useState([]);
@@ -36,7 +37,15 @@ const PlaybookLibrary = ({ onPlaybookLoad }) => {
         throw new Error('Invalid playbook data received from server');
       }
       
-      onPlaybookLoad(playbook);
+      const normalizedXml = normalizeBpmnExtensions(playbook.bpmn_xml);
+      const normalizedPlaybook = {
+        ...playbook,
+        bpmn_xml: normalizedXml && normalizedXml.trim()
+          ? normalizedXml
+          : playbook.bpmn_xml
+      };
+      
+      onPlaybookLoad(normalizedPlaybook);
     } catch (err) {
       console.error('Error loading playbook:', err);
       console.error('Error details:', err.response?.data || err.message);

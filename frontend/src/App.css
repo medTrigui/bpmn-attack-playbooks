@@ -155,12 +155,37 @@
 }
 
 .side-panel {
-  width: 350px;
   background: white;
   border-left: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-width: 260px;
+  max-width: 700px;
+  transition: width 0.1s ease;
+}
+
+.side-panel.resizing {
+  user-select: none;
+  cursor: col-resize;
+}
+
+.side-panel-resize-handle {
+  width: 8px;
+  cursor: col-resize;
+  background: linear-gradient(90deg, rgba(0,0,0,0.05), rgba(0,0,0,0));
+}
+
+.side-panel-resize-handle.active {
+  background: linear-gradient(90deg, rgba(59,130,246,0.2), rgba(59,130,246,0));
+}
+
+.panel-content {
+  flex: 1;
+  overflow-y: auto;
+  background: white;
+  display: flex;
+  flex-direction: column;
 }
 
 .panel-tabs {

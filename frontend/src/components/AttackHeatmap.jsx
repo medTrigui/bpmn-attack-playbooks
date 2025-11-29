@@ -19,6 +19,7 @@ const AttackHeatmap = ({ modeler, playbookId }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [expanded, setExpanded] = useState(new Set());
 
   useEffect(() => {
     let cancelled = false;
@@ -107,9 +108,34 @@ const AttackHeatmap = ({ modeler, playbookId }) => {
       covered_techniques: [],
     };
 
+    const sortedTechniques = tacticCoverage.covered_techniques
+      ? [...tacticCoverage.covered_techniques].sort((a, b) => {
+          const aUsed = techniques.includes(a);
+          const bUsed = techniques.includes(b);
+          if (aUsed === bUsed) return a.localeCompare(b);
+          return aUsed ? -1 : 1;
+        })
+      : [];
+
+    const isExpanded = expanded.has(shortName);
+
     return (
-      <div key={tactic.id} className={`heatmap-card ${classifyHeatLevel(tacticCoverage.percentage)}`}>
-        <div className="tactic-header">
+      <div
+        key={tactic.id}
+        className={`heatmap-card ${classifyHeatLevel(tacticCoverage.percentage)}`}
+      >
+        <div
+          className="tactic-header"
+          onClick={() => {
+            const next = new Set(expanded);
+            if (next.has(shortName)) {
+              next.delete(shortName);
+            } else {
+              next.add(shortName);
+            }
+            setExpanded(next);
+          }}
+        >
           <span className="tactic-name">{tactic.name}</span>
           <span className="tactic-id">{tactic.id}</span>
         </div>
@@ -119,10 +145,13 @@ const AttackHeatmap = ({ modeler, playbookId }) => {
             {tacticCoverage.covered}/{tacticCoverage.total || '—'} techniques
           </div>
         </div>
-        {tacticCoverage.covered_techniques.length > 0 && (
-          <div className="tactic-techniques">
-            {tacticCoverage.covered_techniques.map((techId) => (
-              <span key={techId} className="technique-chip">
+        {sortedTechniques.length > 0 && (
+          <div className={`tactic-techniques ${isExpanded ? 'expanded' : ''}`}>
+            {sortedTechniques.map((techId) => (
+              <span
+                key={techId}
+                className={`technique-chip ${techniques.includes(techId) ? 'active-tech' : ''}`}
+              >
                 {techId}
               </span>
             ))}
@@ -131,6 +160,19 @@ const AttackHeatmap = ({ modeler, playbookId }) => {
       </div>
     );
   };
+
+  const sortedTactics = [...tactics].sort((a, b) => {
+    const aShort = a.x_mitre_shortname || a.short_name;
+    const bShort = b.x_mitre_shortname || b.short_name;
+    const aCovered = (coverage?.coverage_by_tactic?.[aShort]?.covered || 0) > 0;
+    const bCovered = (coverage?.coverage_by_tactic?.[bShort]?.covered || 0) > 0;
+    if (aCovered === bCovered) {
+      const aPerc = coverage?.coverage_by_tactic?.[aShort]?.percentage || 0;
+      const bPerc = coverage?.coverage_by_tactic?.[bShort]?.percentage || 0;
+      return bPerc - aPerc;
+    }
+    return aCovered ? -1 : 1;
+  });
 
   return (
     <div className="attack-heatmap">
@@ -182,7 +224,7 @@ const AttackHeatmap = ({ modeler, playbookId }) => {
           </div>
 
           <div className="heatmap-grid">
-            {tactics.map((tactic) => renderTacticCard(tactic))}
+            {sortedTactics.map((tactic) => renderTacticCard(tactic))}
           </div>
         </>
       )}
@@ -191,5 +233,6 @@ const AttackHeatmap = ({ modeler, playbookId }) => {
 };
 
 export default AttackHeatmap;
+
 
 
