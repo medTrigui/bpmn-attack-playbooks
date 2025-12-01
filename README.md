@@ -9,11 +9,11 @@
 
 ## Overview
 
-This platform enables security teams to design, manage, and execute incident response playbooks using industry-standard **BPMN 2.0** notation integrated with the **MITRE ATT&CK** framework. By combining visual process modeling with threat intelligence, organizations can create executable, threat-informed workflows that guide analysts through complex security incidents.
+Playbooks As a Platform for Incident Response and Investigation System (PAPIRIS) enables security teams to design, manage, and execute incident response playbooks using industry-standard **BPMN 2.0** notation integrated with the **MITRE ATT&CK** framework. By combining visual process modeling with threat intelligence, organizations can create executable, threat-informed workflows that guide analysts through complex security incidents.
 
 ### Core Innovation
 
-Traditional incident response playbooks are static documents (PDFs, Word files) that lack standardization and cannot be automated. This project transforms playbooks into **executable workflows** that:
+Traditional incident response playbooks are static documents (PDFs, Word files) that lack standardization and cannot be automated. PAPIRIS transforms playbooks into **executable workflows** that:
 
 - Use **BPMN 2.0** (industry standard) instead of proprietary formats
 - Map every task to **MITRE ATT&CK techniques** for threat context
